@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JaGa+ | Vendor Companion Hub</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Custom Fonts (Outfit/Jakarta) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+      background-color: #070805;
+      color: #f3f4f6;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    :root {
+      --color-bg-dark: #0c0e08;
+      --color-brand-pink: #ff4d6d;
+      --color-brand-pink-glow: rgba(255, 77, 109, 0.35);
+      --color-olive-card: rgba(26, 29, 19, 0.75);
+    }
+
+    /* Universal Theme Transition */
+    .theme-transition {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, background-image 0.3s ease;
+    }
+
+    /* Custom scrollbars */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Pulsing halo ring animation for VoIP ringing state */
+    @keyframes voip-pulse {
+      0% {
+        transform: scale(0.95);
+        opacity: 0.8;
+      }
+      50% {
+        transform: scale(1.3);
+        opacity: 0.3;
+      }
+      100% {
+        transform: scale(1.6);
+        opacity: 0;
+      }
+    }
+    .voip-halo-ring {
+      animation: voip-pulse 2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+    }
+
+    /* Alarm flashing red background animation */
+    @keyframes alarm-flash {
+      0%, 100% { background-color: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.4); }
+      50% { background-color: rgba(239, 68, 68, 0.4); border-color: rgba(239, 68, 68, 1); }
+    }
+    .alarm-flashing {
+      animation: alarm-flash 1.2s infinite;
+    }
+
+    /* Push Notification slide down effect */
+    @keyframes slide-down-banner {
+      0% { transform: translateY(-100%); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    .banner-slide-down {
+      animation: slide-down-banner 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* ==========================================================
+       THEME SPECIFIC STYLES OVERRIDES FOR APP FRAME
+       ========================================================== */
+    .theme-frame {
+      background-color: #0c0e08;
+      color: #f3f4f6;
+    }
+    .theme-header {
+      background-color: #0c0e08;
+      border-color: #222916;
+    }
+    .theme-card {
+      background-color: #12160a;
+      border-color: #232b14;
+    }
+    .theme-card-secondary {
+      background-color: #1c2211;
+      border-color: #2e371b;
+    }
+    .theme-text-light {
+      color: #f3f4f6;
+    }
+    .theme-text-muted {
+      color: #a8a29e;
+    }
+    .theme-input {
+      background-color: #1a1f10;
+      color: #e2e8f0;
+      border-color: #2d381c;
+    }
+    .theme-voip-overlay {
+      background-color: #080a05;
+      color: #f8fafc;
+    }
+
+    /* Light Mode Overrides */
+    .light-mode.theme-frame {
+      background-color: #f8fafc;
+      color: #1e293b;
+    }
+    .light-mode .theme-header {
+      background-color: #ffffff;
+      border-color: #e2e8f0;
+    }
+    .light-mode .theme-card {
+      background-color: #ffffff;
+      border-color: #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+    .light-mode .theme-card-secondary {
+      background-color: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+    .light-mode .theme-text-light {
+      color: #1e293b;
+    }
+    .light-mode .theme-text-muted {
+      color: #64748b;
+    }
+    .light-mode .theme-input {
+      background-color: #f1f5f9;
+      color: #1e293b;
+      border-color: #cbd5e1;
+    }
+    .light-mode .theme-voip-overlay {
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+  </style>
+</head>
+<body class="flex flex-col sm:flex-row justify-center items-center min-h-screen p-4 bg-gradient-to-br from-[#0c0e08] via-[#14180d] to-[#070805] gap-6">
+
+  <!-- ==============================================
+       LEFT PANEL: LIVE SIMULATOR CONTROLLER
+       ============================================== -->
+  <div class="w-full max-w-xs bg-[#12160a] border border-[#232b14] rounded-3xl p-5 space-y-4 shadow-xl text-xs theme-transition">
+    <div class="flex items-center space-x-2">
+      <span class="p-1 bg-[#ff4d6d]/20 text-[#ff4d6d] rounded-lg">⚙️</span>
+      <h3 class="font-extrabold text-white text-sm tracking-wide">Live Simulator Control Deck</h3>
+    </div>
+    <p class="text-stone-400 leading-relaxed">Use these trigger events to test the newly introduced real-time reschedule agreements, pushing reminders, and lateness no-show alarms.</p>
+    
+    <div class="space-y-2.5 pt-2 border-t border-[#232b14]">
+      <!-- Trigger Reschedule Request -->
+      <button onclick="triggerSimulatedReschedule()" class="w-full text-left bg-stone-900 border border-stone-800 text-stone-200 hover:text-white hover:border-[#ff4d6d] transition-all p-3 rounded-xl flex items-center space-x-2.5">
+        <span class="text-base">📅</span>
+        <div>
+          <span class="block font-bold">Simulate Reschedule Request</span>
+          <span class="text-[9px] text-stone-500">Resident asks to shift Sarah's booking</span>
+        </div>
+      </button>
+
+      <!-- Trigger Coming Soon Reminder -->
+      <button onclick="triggerSimulatedReminder()" class="w-full text-left bg-stone-900 border border-stone-800 text-stone-200 hover:text-white hover:border-[#ff4d6d] transition-all p-3 rounded-xl flex items-center space-x-2.5">
+        <span class="text-base">⏰</span>
+        <div>
+          <span class="block font-bold">Simulate 10-Min Reminder</span>
+          <span class="text-[9px] text-stone-500">Slides down push notification popup</span>
+        </div>
+      </button>
+
+      <!-- Trigger No-Show Alarm -->
+      <button onclick="triggerSimulatedAlarm()" class="w-full text-left bg-stone-900 border border-red-900/40 text-red-300 hover:text-white hover:border-red-500 transition-all p-3 rounded-xl flex items-center space-x-2.5 bg-red-950/10">
+        <span class="text-base">🚨</span>
+        <div>
+          <span class="block font-bold text-red-400">Simulate Late Alarm</span>
+          <span class="text-[9px] text-stone-500">Flashing siren overlay on dashboard</span>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Device Mockup Frame -->
+  <div id="appFrame" class="theme-frame theme-transition relative w-full max-w-md h-[92vh] sm:h-[840px] rounded-none sm:rounded-[40px] border-0 sm:border-8 border-[#1f2415] shadow-2xl flex flex-col overflow-hidden">
+    
+    <!-- DYNAMIC PUSH NOTIFICATION POPUP BANNER (Fixed stacking issue by applying z-[100] layer override) -->
+    <div id="pushNotificationBanner" class="hidden absolute top-3 left-4 right-4 bg-stone-900/95 border border-[#ff4d6d]/40 rounded-2xl p-4 shadow-2xl z-[100] flex flex-col space-y-3 banner-slide-down">
+      <div class="flex justify-between items-start">
+        <div class="flex items-center space-x-2.5">
+          <span class="text-lg">⏰</span>
+          <div>
+            <h4 class="text-xs font-black text-white">UPCOMING BOOKING REMINDER</h4>
+            <p class="text-[10px] text-stone-300 mt-0.5" id="pushNotificationText">You have a plumbing job with Sarah in 10 minutes!</p>
+          </div>
+        </div>
+        <span class="text-[8px] text-[#ff4d6d] font-bold">Now</span>
+      </div>
+      <div class="flex space-x-2">
+        <button onclick="markVendorOnMyWay()" class="flex-1 bg-[#ff4d6d] text-white text-[10px] font-black py-1.5 rounded-lg text-center uppercase tracking-wide">On My Way</button>
+        <button onclick="dismissPushBanner()" class="px-3 bg-stone-800 text-stone-400 text-[10px] font-bold py-1.5 rounded-lg text-center">Dismiss</button>
+      </div>
+    </div>
+
+    <!-- Simulated Status Bar -->
+    <div class="px-6 pt-3 pb-1 flex justify-between items-center text-xs text-stone-400 select-none z-30 theme-transition">
+      <span class="font-bold">6:12 PM</span>
+      <div class="hidden sm:block absolute left-1/2 transform -translate-x-1/2 top-2 w-24 h-4 bg-black rounded-full"></div>
+      <div class="flex items-center space-x-1">
+        <span class="text-[9px] uppercase tracking-wider bg-[#ff4d6d] text-white px-1.5 py-0.5 rounded font-black">Vendor Admin</span>
+      </div>
+    </div>
+
+    <!-- App Header -->
+    <div class="theme-header theme-transition px-5 py-3 border-b flex justify-between items-center z-30 shadow-md">
+      <div class="flex items-center space-x-2">
+        <div class="flex items-center">
+          <span class="text-xl font-black tracking-wider theme-text-light theme-transition">JaGa</span>
+          <span class="text-xl font-bold text-[#ff4d6d] drop-shadow-[0_0_8px_rgba(255,77,109,0.5)]">Partner</span>
+        </div>
+      </div>
+
+      <!-- Theme & Profile Picker Controls -->
+      <div class="flex items-center space-x-2.5">
+        <!-- Dynamic Theme Toggle -->
+        <button onclick="toggleTheme()" class="p-1.5 rounded-full border theme-card-secondary theme-transition text-[#ff4d6d] hover:scale-105 active:scale-95 transition-all shadow-sm">
+          <svg id="theme-sun-icon" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+          </svg>
+          <svg id="theme-moon-icon" class="hidden w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
+        </button>
+
+        <!-- Simulated active service category filter selector -->
+        <div class="relative">
+          <button id="vendorProfileBtn" class="flex items-center space-x-1 theme-card-secondary theme-transition text-xs px-2.5 py-1 rounded-full border">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span id="currentVendorName" class="font-bold theme-text-light">Pak Abu Plumb</span>
+            <svg class="w-3 h-3 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          
+          <div id="profileDropdown" class="hidden absolute top-7 right-0 w-44 bg-[#14180d] border border-[#2b321c] rounded-xl shadow-2xl overflow-hidden z-50">
+            <button onclick="changeActiveVendor('Pak Abu Plumbing')" class="w-full text-left px-3.5 py-2 text-xs text-stone-200 hover:bg-[#1f2414] font-medium transition-colors border-b border-[#202715]">Pak Abu Plumbing</button>
+            <button onclick="changeActiveVendor('Ah Beng Aircon Pak')" class="w-full text-left px-3.5 py-2 text-xs text-stone-300 hover:bg-[#1f2414] font-medium transition-colors border-b border-[#202715]">Ah Beng Aircon</button>
+            <button onclick="changeActiveVendor('Pak Din Locksmith')" class="w-full text-left px-3.5 py-2 text-xs text-stone-300 hover:bg-[#1f2414] font-medium transition-colors">Pak Din Locksmith</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Vendor Stats Ribbon -->
+    <div class="bg-[#171b0e] py-2 px-5 border-b border-[#2b331b] flex justify-between items-center text-xs text-[#b4c498] select-none theme-transition">
+      <div class="flex items-center space-x-1.5">
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        <span class="font-bold">Pak Abu Plumbing is Active</span>
+      </div>
+      <div class="flex space-x-3.5">
+        <span>Today: <strong class="theme-text-light text-white" id="statTodayCount">3 jobs</strong></span>
+        <span>Balance: <strong class="text-[#ff4d6d]" id="statEarningBalance">RM 520.00</strong></span>
+      </div>
+    </div>
+
+    <!-- SCROLL CONTAINER FOR THE SERVICE MANAGEMENT VIEWS -->
+    <div id="mainContentScroll" class="flex-1 overflow-y-auto relative no-scrollbar">
+      
+      <!-- ==============================================
+           TAB 1: JOBS (ACTIVE BOOKING LIST & PHOTOS INSPECT)
+           ============================================== -->
+      <div id="view-jobs" class="tab-view py-4 px-4 space-y-4">
+        
+        <div class="flex justify-between items-center mb-1">
+          <div>
+            <h2 class="text-sm font-extrabold tracking-wide uppercase theme-text-muted">Assigned Bookings</h2>
+            <p class="text-[11px] theme-text-muted font-medium">Verify diagnostics and issue outstanding quotations</p>
+          </div>
+          <span class="bg-[#ff4d6d]/15 text-[#ff4d6d] text-[10px] font-extrabold px-2.5 py-1 rounded-full border border-[#ff4d6d]/20">New: 1</span>
+        </div>
+
+        <div id="active-jobs-list" class="space-y-4">
+          <!-- Injected dynamically in JS based on active vendor profile -->
+        </div>
+
+      </div>
+
+      <!-- ==============================================
+           TAB 2: CHAT HUB (DIRECT COORDINATION ENGINE)
+           ============================================== -->
+      <div id="view-chat" class="tab-view hidden py-4 px-4 space-y-4">
+        
+        <div class="flex justify-between items-center mb-1">
+          <div>
+            <h2 class="text-sm font-extrabold tracking-wide uppercase theme-text-muted">Coordination Centre</h2>
+            <p class="text-[11px] theme-text-muted font-medium">Instantly coordinate access and entry permits with residents</p>
+          </div>
+        </div>
+
+        <div class="space-y-2.5">
+          <!-- Active Resident Channels List -->
+          <div onclick="openActiveChatChannel('Unit B-08 (Sarah)')" class="theme-card border p-4 rounded-2xl flex justify-between items-center cursor-pointer hover:border-[#ff4d6d] theme-transition">
+            <div class="flex items-center space-x-3.5">
+              <div class="w-10 h-10 rounded-full bg-[#ff4d6d]/10 border border-[#ff4d6d]/30 flex items-center justify-center font-bold text-xs text-[#ff4d6d]">B8</div>
+              <div>
+                <h4 class="text-xs font-black theme-text-light">Unit B-08 (Sarah)</h4>
+                <p class="text-[10px] theme-text-muted mt-0.5" id="chatChannelLastMsg">Hey, my secure callout slot has been paid. Will you...</p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#ff4d6d] animate-pulse"></span>
+            </div>
+          </div>
+
+          <div onclick="showToast('Loading channel history...')" class="theme-card border p-4 rounded-2xl flex justify-between items-center cursor-pointer hover:border-[#ff4d6d] opacity-50 theme-transition">
+            <div class="flex items-center space-x-3.5">
+              <div class="w-10 h-10 rounded-full bg-stone-700 flex items-center justify-center font-bold text-xs">A12</div>
+              <div>
+                <h4 class="text-xs font-black theme-text-light">Unit A-12 (Daniel)</h4>
+                <p class="text-[10px] theme-text-muted mt-0.5">Permits are registered. I will let you in at Block A...</p>
+              </div>
+            </div>
+            <span class="text-[9px] theme-text-muted">Yesterday</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ==============================================
+         NEW: DYNAMIC MODAL - SITE INSPECTION QUOTATION DRAFTER
+         ============================================== -->
+    <div id="quoteDrafterModal" class="hidden absolute inset-0 bg-[#0c0e08]/95 z-[70] overflow-y-auto flex flex-col animate-fade-in theme-transition">
+      
+      <div class="px-5 py-4 border-b theme-header theme-transition flex items-center justify-between">
+        <h3 class="text-xs font-black theme-text-light">Draft Outsite Quotation</h3>
+        <button onclick="closeQuoteDrafter()" class="text-stone-400 hover:text-white p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-5 flex-1">
+        <div class="space-y-1">
+          <h4 class="text-xs font-black theme-text-light">Resident Destination: <span class="text-[#ff4d6d]">Unit B-08</span></h4>
+          <p class="text-[10px] theme-text-muted">Plumbing Job: Kitchen Sink connection seal fracture (AI scan verification completed)</p>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Quote Drafting Fields -->
+          <div class="space-y-1">
+            <label class="block text-[10px] font-black uppercase theme-text-muted tracking-wider">Confirmed Repair Description</label>
+            <input id="draftIssueDesc" type="text" value="Gasket connector fitting replacement & silicone re-solder joints" class="w-full theme-input theme-transition border rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#ff4d6d]">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3.5">
+            <div class="space-y-1">
+              <label class="block text-[10px] font-black uppercase theme-text-muted tracking-wider">Labor & Parts Cost (RM)</label>
+              <input oninput="updateDraftSumTotals()" id="draftLaborCost" type="number" value="120" class="w-full theme-input theme-transition border rounded-xl px-3 py-2 text-xs focus:outline-none">
+            </div>
+            <div class="space-y-1">
+              <label class="block text-[10px] font-black uppercase theme-text-muted tracking-wider">Tax Rate (SST %)</label>
+              <input oninput="updateDraftSumTotals()" id="draftTaxRate" type="number" value="8" class="w-full theme-input theme-transition border rounded-xl px-3 py-2 text-xs focus:outline-none" disabled>
+            </div>
+          </div>
+
+          <!-- Dynamic Billing breakdown containing offsets -->
+          <div class="theme-card border p-4 rounded-xl space-y-2.5 text-xs">
+            <div class="flex justify-between">
+              <span class="theme-text-muted">Calculated Repair Subtotal:</span>
+              <span id="draftSubtotalText" class="font-bold theme-text-light">RM 120.00</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="theme-text-muted">Service Tax (8% SST):</span>
+              <span id="draftSstText" class="font-bold theme-text-light">RM 9.60</span>
+            </div>
+            <div class="flex justify-between text-emerald-400 font-extrabold border-b border-dashed theme-header pb-2.5">
+              <span>Paid Callout Fee (Offset):</span>
+              <span>- RM 50.00</span>
+            </div>
+            <div class="flex justify-between font-black text-xs pt-1">
+              <span class="theme-text-light">Total Outstanding (Balance):</span>
+              <span id="draftOutstandingText" class="text-[#ff4d6d]">RM 79.60</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer action triggers -->
+      <div class="p-4 theme-header theme-transition border-t space-y-2 bg-stone-950">
+        <button onclick="sendDraftedQuoteToResident()" class="w-full bg-[#ff4d6d] hover:bg-[#ff5d7b] text-white text-xs font-black py-3 rounded-xl transition-all brand-glow uppercase tracking-wider">
+          Submit Quote to Resident
+        </button>
+        <p class="text-[9px] theme-text-muted text-center leading-relaxed">Once submitted, the resident will receive an instant invoice pass to pay outstanding balances directly in-app.</p>
+      </div>
+
+    </div>
+
+    <!-- ==============================================
+         REAL-TIME SERVICE BOOKING CHAT DRAWER
+         ============================================== -->
+    <div id="bookingChatDrawer" class="hidden absolute inset-0 theme-frame z-[60] flex flex-col animate-fade-in theme-transition">
+      <div class="px-5 py-3 border-b theme-header theme-transition flex items-center justify-between shadow-md">
+        <div class="flex items-center space-x-3">
+          <button onclick="closeBookingChat()" class="text-stone-300 hover:text-white bg-stone-900 p-2 rounded-xl">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          <div>
+            <h3 id="chatResidentName" class="text-xs font-black theme-text-light">Unit B-08 (Sarah)</h3>
+            <span class="text-[9px] text-[#9fc759] font-bold">● Active Conversation</span>
+          </div>
+        </div>
+        
+        <!-- VoIP Call Control Actions inside chat header -->
+        <div class="flex items-center space-x-2">
+          <button onclick="startInAppVoipCall()" class="p-2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-xl hover:bg-emerald-500/20 active:scale-95 transition-all flex items-center space-x-1.5" title="Initiate In-App Voice Call">
+            <svg class="w-4 h-4 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-2.824-1.802-5.14-4.125-6.944-6.944l1.293-.97c.362-.272.528-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.11-1.008H4.5A2.25 2.25 0 002.25 4.5v2.25z"/>
+            </svg>
+            <span class="text-[9px] font-black uppercase tracking-wider hidden sm:inline">Call Resident</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Warning Prompt if resident hasn't read the chat messages (SPEEDS UP LOOP) -->
+      <div id="unreadVoipPrompt" class="bg-gradient-to-r from-amber-500/10 to-amber-600/5 border-b border-amber-500/20 p-2.5 px-4 flex justify-between items-center text-[10px] text-amber-500">
+        <div class="flex items-center space-x-2">
+          <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+          <span>Sarah hasn't read your messages yet. Ring her directly?</span>
+        </div>
+        <button onclick="startInAppVoipCall()" class="bg-amber-500 text-stone-950 font-black px-2.5 py-1 rounded-lg uppercase text-[9px] tracking-wider transition-all hover:bg-amber-400">
+          Ring Now
+        </button>
+      </div>
+
+      <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-3.5 text-xs">
+        <!-- Message threads injected dynamically -->
+      </div>
+
+      <!-- Quick responses template -->
+      <div class="px-4 py-2 theme-header theme-transition border-t flex space-x-1.5 overflow-x-auto no-scrollbar">
+        <button onclick="sendQuickChatMessage('I have arrived at guard gate Block B!')" class="theme-card-secondary theme-transition theme-text-light px-3 py-1 rounded-full text-[10px] font-bold whitespace-nowrap">🚪 Arrived at Block B</button>
+        <button onclick="sendQuickChatMessage('Do you need elevator permit support?')" class="theme-card-secondary theme-transition theme-text-light px-3 py-1 rounded-full text-[10px] font-bold whitespace-nowrap">🏢 Permit Support</button>
+      </div>
+
+      <div class="p-3 border-t theme-header theme-transition flex items-center space-x-2.5 bg-stone-950">
+        <input id="chatInput" type="text" placeholder="Type a response..." class="flex-1 theme-input theme-transition border rounded-xl px-3.5 py-2.5 text-xs placeholder-stone-500 focus:outline-none focus:ring-1 focus:ring-[#ff4d6d]">
+        <button onclick="handleSendButton()" class="bg-[#ff4d6d] hover:bg-[#ff5d7b] text-white p-2.5 rounded-xl transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ==============================================
+         NEW: IN-APP VoIP CALLING MODAL OVERLAY
+         ============================================== -->
+    <div id="voipCallOverlay" class="hidden absolute inset-0 theme-voip-overlay z-[80] flex flex-col justify-between py-16 px-8 text-center theme-transition">
+      
+      <!-- VoIP Call Metadata Header -->
+      <div class="space-y-1.5">
+        <span class="text-[9px] font-black uppercase tracking-widest text-[#ff4d6d]">JaGa+ In-App Voice Call</span>
+        <h2 id="voipCallerName" class="text-xl font-extrabold tracking-wide">Sarah (Unit B-08)</h2>
+        <p id="voipCallStatus" class="text-xs text-stone-400 font-semibold animate-pulse">Ringing...</p>
+      </div>
+
+      <!-- Caller Pulse Radar Wave (Visual representation of connection activity) -->
+      <div class="flex justify-center items-center relative py-12">
+        <div id="voipPulseRing1" class="absolute w-36 h-36 rounded-full border border-[#ff4d6d]/40 voip-halo-ring"></div>
+        <div id="voipPulseRing2" class="absolute w-36 h-36 rounded-full border border-emerald-500/20 voip-halo-ring" style="animation-delay: 1s"></div>
+        
+        <!-- Center Profile Icon -->
+        <div class="w-24 h-24 rounded-full bg-stone-900 border-4 border-[#ff4d6d] flex items-center justify-center font-extrabold text-3xl shadow-xl relative z-10 text-white">
+          <span id="voipAvatarInitials">SA</span>
+        </div>
+      </div>
+
+      <!-- Call Control Button Interfaces -->
+      <div class="space-y-8">
+        
+        <!-- Toggle control options -->
+        <div class="grid grid-cols-3 gap-4 max-w-[280px] mx-auto">
+          <!-- Mute Option -->
+          <button onclick="toggleVoipMute(this)" class="flex flex-col items-center space-y-2 group">
+            <div class="p-3.5 bg-white/10 hover:bg-white/20 rounded-full text-stone-200 transition-all active:scale-95 shadow-md flex items-center justify-center">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"/>
+              </svg>
+            </div>
+            <span class="text-[9px] font-black uppercase tracking-wider text-stone-400">Mute</span>
+          </button>
+
+          <!-- Keypad Option -->
+          <button onclick="showToast('Keypad inputs enabled.')" class="flex flex-col items-center space-y-2 group">
+            <div class="p-3.5 bg-white/10 hover:bg-white/20 rounded-full text-stone-200 transition-all active:scale-95 shadow-md flex items-center justify-center">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0020.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25a2.25 2.25 0 01-13.5 18v-2.25z"/>
+              </svg>
+            </div>
+            <span class="text-[9px] font-black uppercase tracking-wider text-stone-400">Keypad</span>
+          </button>
+
+          <!-- Speakerphone Option -->
+          <button onclick="toggleVoipSpeaker(this)" class="flex flex-col items-center space-y-2 group">
+            <div class="p-3.5 bg-white/10 hover:bg-white/20 rounded-full text-stone-200 transition-all active:scale-95 shadow-md flex items-center justify-center">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z"/>
+              </svg>
+            </div>
+            <span class="text-[9px] font-black uppercase tracking-wider text-stone-400">Speaker</span>
+          </button>
+        </div>
+
+        <!-- Master Hangup Button -->
+        <div class="flex justify-center">
+          <button onclick="endInAppVoipCall()" class="w-16 h-14 rounded-full bg-red-500 hover:bg-red-600 shadow-[0_5px_15px_rgba(239,68,68,0.4)] flex items-center justify-center text-white transition-all transform active:scale-90" title="Hangup Call">
+            <svg class="w-6 h-6 transform rotate-[135deg]" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-2.824-1.802-5.14-4.125-6.944-6.944l1.293-.97c.362-.272.528-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.11-1.008H4.5A2.25 2.25 0 002.25 4.5v2.25z"/>
+            </svg>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ==============================================
+         NEW: EMERGENCY NO-SHOW / DELAY ALARM MODAL OVERLAY
+         ============================================== -->
+    <div id="emergencyAlarmOverlay" class="hidden absolute inset-0 bg-red-950/95 z-[90] flex flex-col justify-between py-12 px-6 text-center select-none theme-transition border-8 border-red-600">
+      
+      <!-- Flashing Siren Box -->
+      <div class="space-y-2">
+        <div class="w-14 h-14 rounded-full bg-red-600 animate-ping mx-auto flex items-center justify-center text-white">🚨</div>
+        <span class="text-[10px] font-black uppercase tracking-widest text-red-500 block">System Warning Alert</span>
+        <h2 class="text-xl font-extrabold text-white">APPOINTMENT TIME EXCEEDED!</h2>
+        <p class="text-[11px] text-stone-300 px-4 leading-relaxed">
+          You are currently late for your appointment with <strong class="text-red-400" id="alarmResidentName">Sarah (Unit B-08)</strong>. Resident has been waiting since <strong class="text-red-400">10:00 AM</strong>.
+        </p>
+      </div>
+
+      <!-- Action Required Card -->
+      <div class="bg-red-950/40 border border-red-500/40 rounded-2xl p-4 space-y-3.5 mx-auto w-full max-w-[320px]">
+        <h4 class="text-xs font-black text-red-300">Prevent Booking Cancel Penalty</h4>
+        <p class="text-[10px] text-stone-400 leading-normal">To avoid a penalty fee (or booking drop flags), please verify your current dispatch status or call the client immediately to coordinate lobby registration passes.</p>
+        
+        <div class="flex flex-col gap-2">
+          <!-- Quick Call -->
+          <button onclick="emergencyCallResident()" class="w-full bg-[#ff4d6d] hover:bg-[#ff5d7b] text-white text-[11px] font-black py-2.5 rounded-xl uppercase tracking-wider flex justify-center items-center space-x-2">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-2.824-1.802-5.14-4.125-6.944-6.944l1.293-.97c.362-.272.528-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.11-1.008H4.5A2.25 2.25 0 002.25 4.5v2.25z"/></svg>
+            <span>Call Sarah Now</span>
+          </button>
+          
+          <!-- Dispatch Update -->
+          <button onclick="reportDelayToConcierge()" class="w-full bg-stone-900 hover:bg-stone-800 text-stone-300 text-[10px] font-bold py-2 rounded-xl border border-stone-800">
+            Report 10-Min Delay
+          </button>
+        </div>
+      </div>
+
+      <!-- Dismiss Button -->
+      <div>
+        <button onclick="resolveLatenessAlarm()" class="text-xs text-stone-500 hover:text-white underline font-semibold">I have Arrived (Cancel Alarm)</button>
+      </div>
+
+    </div>
+
+    <!-- DYNAMIC APP TOASTS -->
+    <div id="toastMessage" class="hidden absolute top-16 left-1/2 transform -translate-x-1/2 bg-[#ff4d6d] text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl z-[100] flex items-center space-x-2 border border-white/20 select-none">
+      <span id="toastText">Action successful!</span>
+    </div>
+
+    <!-- VENDOR PORTAL NAVIGATION BAR -->
+    <div class="relative bg-white pt-2.5 pb-6 border-t border-stone-200 z-30 shadow-[0_-5px_15px_rgba(0,0,0,0.06)] px-4 flex justify-around items-center select-none text-stone-500">
+      
+      <!-- Tab 1: Bookings List -->
+      <button onclick="switchTab('jobs')" id="nav-jobs" class="flex-1 flex flex-col items-center space-y-1 text-stone-800 transition-colors">
+        <div class="p-1 px-3 rounded-full bg-red-100 text-stone-900 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+        </div>
+        <span class="text-[9px] font-bold">Bookings</span>
+      </button>
+
+      <!-- Tab 2: Chat Hub -->
+      <button onclick="switchTab('chat')" id="nav-chat" class="flex-1 flex flex-col items-center space-y-1 transition-colors">
+        <div class="p-1 px-3 rounded-full transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+        </div>
+        <span class="text-[9px] font-bold">Chat Hub</span>
+      </button>
+
+    </div>
+
+  </div>
+
+  <script>
+    // Mock Database for Vendors Companion Hub
+    let vendorDb = {
+      activeVendor: 'Pak Abu Plumbing',
+      profiles: {
+        'Pak Abu Plumbing': {
+          stats: { todayCount: '3 jobs', earnings: 'RM 520.00' },
+          bookings: [
+            {
+              id: 'plumbing-1',
+              resident: 'Sarah (Unit B-08)',
+              issue: 'Sink Drainage connector leak',
+              schedule: '18 May, 10:00 AM',
+              costEstimate: 'RM 90 - RM 140',
+              calloutOffset: 'RM 50.00 paid',
+              aiConfidence: '94% Confidence',
+              status: 'Awaiting inspection', // Awaiting inspection, Quoted, Paid
+              photo: '💧',
+              rescheduleRequest: null // Will hold rescheduled data dynamically
+            },
+            {
+              id: 'plumbing-2',
+              resident: 'Raju (Unit C-14)',
+              issue: 'Low water pressure toilet',
+              schedule: '19 May, 01:00 PM',
+              costEstimate: 'RM 100 - RM 150',
+              calloutOffset: 'RM 50.00 paid',
+              aiConfidence: '85% Confidence',
+              status: 'Awaiting inspection',
+              photo: '🚽',
+              rescheduleRequest: null
+            }
+          ]
+        },
+        'Ah Beng Aircon Pak': {
+          stats: { todayCount: '2 jobs', earnings: 'RM 432.00' },
+          bookings: [
+            {
+              id: 'aircon-1',
+              resident: 'Daniel (Unit A-12)',
+              issue: 'Multi-unit wallmounted Chemical Deep Cleaning',
+              schedule: '18 May, 01:00 PM',
+              costEstimate: 'RM 216.00',
+              calloutOffset: 'Pre-paid',
+              aiConfidence: 'Confirmed',
+              status: 'Paid',
+              photo: '🧪',
+              rescheduleRequest: null
+            }
+          ]
+        },
+        'Pak Din Locksmith': {
+          stats: { todayCount: '1 job', earnings: 'RM 120.00' },
+          bookings: [
+            {
+              id: 'locksmith-1',
+              resident: 'Wong (Unit D-05)',
+              issue: 'Emergency main door grill lockout assist',
+              schedule: '18 May, 03:30 PM',
+              costEstimate: 'RM 150.00',
+              calloutOffset: 'RM 50.00 paid',
+              aiConfidence: 'Confirmed',
+              status: 'Awaiting inspection',
+              photo: '🔑',
+              rescheduleRequest: null
+            }
+          ]
+        }
+      }
+    };
+
+    let activeTab = 'jobs';
+    let currentTheme = 'dark';
+    let selectedBookingQuoteId = '';
+
+    // VoIP Simulated Variables
+    let voipTimerInterval = null;
+    let voipSeconds = 0;
+    let isVoipMuted = false;
+    let isVoipSpeakerActive = false;
+
+    // Initial load
+    window.onload = function() {
+      renderActiveBookings();
+    };
+
+    // Tabs navigation controller
+    function switchTab(tabId) {
+      activeTab = tabId;
+      ['jobs', 'chat'].forEach(t => {
+        const btn = document.getElementById(`nav-${t}`);
+        const iconDiv = btn.querySelector('div');
+        if (t === tabId) {
+          iconDiv.className = "p-1 px-3 rounded-full bg-red-100 text-stone-900 transition-all";
+          btn.className = "flex-1 flex flex-col items-center space-y-1 text-stone-800 transition-colors";
+        } else {
+          iconDiv.className = "p-1 px-3 rounded-full text-stone-500 transition-all";
+          btn.className = "flex-1 flex flex-col items-center space-y-1 transition-colors";
+        }
+      });
+
+      document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
+      document.getElementById(`view-${tabId}`).classList.remove('hidden');
+      document.getElementById('mainContentScroll').scrollTop = 0;
+    }
+
+    // Dynamic renderer for vendor assignments list
+    function renderActiveBookings() {
+      const container = document.getElementById('active-jobs-list');
+      container.innerHTML = '';
+      
+      const currentProfile = vendorDb.profiles[vendorDb.activeVendor];
+      const bookings = currentProfile.bookings;
+
+      if (bookings.length === 0) {
+        container.innerHTML = `<div class="text-center py-8 text-xs theme-text-muted">No bookings assigned for today.</div>`;
+        return;
+      }
+
+      bookings.forEach(b => {
+        const card = document.createElement('div');
+        
+        // Check if there is an active lateness alarm state simulated
+        const isAlarmed = (b.id === 'plumbing-1' && document.getElementById('emergencyAlarmOverlay').classList.contains('alarm-active'));
+        const alarmClass = isAlarmed ? 'alarm-flashing border-red-500 bg-red-950/10' : '';
+
+        card.className = `theme-card theme-transition border rounded-2xl p-4 space-y-3 shadow-md ${alarmClass}`;
+        
+        let badgeStyle = "bg-[#ff4d6d]/15 text-[#ff4d6d] border-[#ff4d6d]/30";
+        if (b.status === "Quoted") badgeStyle = "bg-amber-500/10 text-amber-500 border-amber-500/20";
+        if (b.status === "Paid") badgeStyle = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+
+        // HTML Layout compilation
+        let cardHtml = `
+          <div class="flex justify-between items-start">
+            <div class="flex items-center space-x-2.5">
+              <span class="text-2xl p-2 bg-[#ff4d6d]/10 rounded-xl select-none text-[#ff4d6d]">${b.photo}</span>
+              <div>
+                <h4 class="text-xs font-black theme-text-light">${b.resident}</h4>
+                <p class="text-[10px] theme-text-muted mt-0.5">${b.schedule}</p>
+              </div>
+            </div>
+            <span class="border px-2 py-0.5 text-[9px] font-black uppercase rounded-full ${badgeStyle}">${b.status}</span>
+          </div>
+        `;
+
+        // RESCHEDULE BANNER COMPONENT
+        // Rendered inline within the booking card if a reschedule request is active
+        if (b.rescheduleRequest && b.rescheduleRequest.status === 'pending') {
+          cardHtml += `
+            <div class="bg-amber-500/10 border border-amber-500/40 rounded-xl p-3 space-y-2 text-xs theme-transition">
+              <div class="flex justify-between items-center text-[10px]">
+                <span class="text-amber-500 font-extrabold uppercase tracking-wide">⚠️ RESCHEDULE REQUESTED</span>
+                <span class="text-stone-400">By Resident</span>
+              </div>
+              <p class="text-[11px] theme-text-light">Sarah requested to shift this slot to:<br><strong class="text-white">${b.rescheduleRequest.proposedTime}</strong></p>
+              
+              <div class="flex space-x-2 pt-1">
+                <button onclick="approveReschedule('${b.id}')" class="flex-1 bg-amber-500 hover:bg-amber-400 text-stone-950 font-black py-1.5 rounded-lg text-center text-[10px] uppercase tracking-wider active:scale-95 transition-all">
+                  Approve Date
+                </button>
+                <button onclick="rejectReschedule('${b.id}')" class="px-3 bg-stone-900 border border-stone-800 text-stone-400 hover:text-white text-[10px] font-bold py-1.5 rounded-lg text-center active:scale-95 transition-all">
+                  Decline
+                </button>
+              </div>
+            </div>
+          `;
+        }
+
+        cardHtml += `
+          <div class="space-y-1">
+            <p class="text-xs font-bold theme-text-light">${b.issue}</p>
+            <div class="flex justify-between text-[10px] theme-text-muted pt-1">
+              <span>Cost Estimate: <strong>${b.costEstimate}</strong></span>
+              <span>Callout Offset: <strong class="text-emerald-500 font-extrabold">${b.calloutOffset}</strong></span>
+            </div>
+          </div>
+
+          <!-- Diagnostic Attachment Box -->
+          <div class="bg-amber-500/5 border border-dashed border-amber-500/30 p-2.5 rounded-xl flex justify-between items-center text-[10px] theme-transition">
+            <div class="flex items-center space-x-1.5 text-amber-500">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              <span class="font-bold">Resident Photo Diagnostic</span>
+            </div>
+            <span class="text-stone-500 font-semibold">${b.aiConfidence}</span>
+          </div>
+
+          <!-- Multi action triggers -->
+          <div class="pt-2.5 border-t theme-header theme-transition flex justify-between gap-2.5">
+            <button onclick="openActiveChatChannel('${b.resident}')" class="flex-1 theme-btn-action theme-transition border text-center py-2 text-[10px] font-bold rounded-xl flex items-center justify-center space-x-1">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+              <span>Coordinate Chat</span>
+            </button>
+            ${
+              b.status === "Awaiting inspection" 
+              ? `<button onclick="openQuoteDrafter('${b.id}')" class="flex-1 bg-[#ff4d6d] hover:bg-[#ff5d7b] text-white text-center py-2 text-[10px] font-bold rounded-xl flex items-center justify-center space-x-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                  <span>Draft Quotation</span>
+                 </button>`
+              : `<button onclick="showInvoicePaidReceipt('${b.id}')" class="flex-1 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-center py-2 text-[10px] font-bold rounded-xl">
+                  Receipt Logged ✓
+                 </button>`
+            }
+          </div>
+        `;
+
+        card.innerHTML = cardHtml;
+        container.appendChild(card);
+      });
+    }
+
+    // Profile Selector Dropdown logic
+    const dropdownBtn = document.getElementById('locDropdownBtn');
+    const dropdown = document.getElementById('profileDropdown');
+    document.getElementById('vendorProfileBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdown.classList.toggle('hidden');
+    });
+    document.addEventListener('click', () => {
+      dropdown.classList.add('hidden');
+    });
+
+    function changeActiveVendor(vendorName) {
+      vendorDb.activeVendor = vendorName;
+      document.getElementById('currentVendorName').innerText = vendorName.substring(0, 12) + "...";
+      
+      const stats = vendorDb.profiles[vendorName].stats;
+      document.getElementById('statTodayCount').innerText = stats.todayCount;
+      document.getElementById('statEarningBalance').innerText = stats.earnings;
+
+      renderActiveBookings();
+      showToast(`Switched active profile: ${vendorName}`);
+    }
+
+    // Opening Direct Chat channel
+    function openActiveChatChannel(residentName) {
+      document.getElementById('chatResidentName').innerText = residentName;
+      document.getElementById('bookingChatDrawer').classList.remove('hidden');
+
+      // Reset the unread warnings
+      document.getElementById('unreadVoipPrompt').classList.remove('hidden');
+
+      // Preload coordination messages
+      const messagesContainer = document.getElementById('chatMessages');
+      messagesContainer.innerHTML = `
+        <div class="flex space-x-2">
+          <div class="w-8 h-8 rounded-xl bg-[#ff4d6d]/10 flex items-center justify-center shrink-0 border border-[#ff4d6d]/25">
+            <span class="text-[10px] font-bold text-[#ff4d6d]">RE</span>
+          </div>
+          <div class="theme-card border p-3 rounded-2xl rounded-tl-none theme-text-light leading-relaxed max-w-[80%] theme-transition">
+            Hello, my secure booking callout slot has been paid. Will you be bringing the gasket connectors directly? I am locked out of structural changes inside Block B.
+          </div>
+        </div>
+      `;
+    }
+
+    function closeBookingChat() {
+      document.getElementById('bookingChatDrawer').classList.add('hidden');
+    }
+
+    // Direct chat triggers
+    function handleSendButton() {
+      const input = document.getElementById('chatInput');
+      if (input.value.trim() === '') return;
+      sendQuickChatMessage(input.value);
+      input.value = '';
+    }
+
+    function sendQuickChatMessage(text) {
+      const container = document.getElementById('chatMessages');
+      
+      const userBubble = document.createElement('div');
+      userBubble.className = "flex justify-end";
+      userBubble.innerHTML = `
+        <div class="bg-[#ff4d6d] text-white p-3 rounded-2xl rounded-tr-none max-w-[80%] shadow-md font-medium">
+          ${text}
+        </div>
+      `;
+      container.appendChild(userBubble);
+      container.scrollTop = container.scrollHeight;
+
+      document.getElementById('chatChannelLastMsg').innerText = text;
+
+      // Simulated auto resident reply
+      setTimeout(() => {
+        const reply = document.createElement('div');
+        reply.className = "flex space-x-2";
+        reply.innerHTML = `
+          <div class="w-8 h-8 rounded-xl bg-[#ff4d6d]/10 flex items-center justify-center shrink-0 border border-[#ff4d6d]/25"><span class="text-[10px] font-bold text-[#ff4d6d]">RE</span></div>
+          <div class="theme-card border p-3 rounded-2xl rounded-tl-none theme-text-light max-w-[80%] theme-transition">Perfect! I will notify the security gate of your vehicle license number. See you shortly at Changkat View Block B!</div>
+        `;
+        container.appendChild(reply);
+        container.scrollTop = container.scrollHeight;
+      }, 1500);
+    }
+
+    // ==============================================
+    // IN-APP VoIP CALL LOGIC
+    // ==============================================
+    function startInAppVoipCall() {
+      const residentName = document.getElementById('chatResidentName').innerText;
+      document.getElementById('voipCallerName').innerText = residentName;
+      document.getElementById('voipAvatarInitials').innerText = residentName.substring(0, 2).toUpperCase();
+      
+      // Reset call variables
+      isVoipMuted = false;
+      isVoipSpeakerActive = false;
+      voipSeconds = 0;
+      document.getElementById('voipCallStatus').innerText = "Ringing...";
+      document.getElementById('voipCallStatus').className = "text-xs text-stone-400 font-semibold animate-pulse";
+      
+      // Show VoIP overlay
+      document.getElementById('voipCallOverlay').classList.remove('hidden');
+
+      // Simulate connection pickup after 3 seconds
+      setTimeout(() => {
+        document.getElementById('voipCallStatus').innerText = "Connected (00:00)";
+        document.getElementById('voipCallStatus').className = "text-xs text-emerald-400 font-extrabold";
+        
+        // Start duration timer
+        voipTimerInterval = setInterval(() => {
+          voipSeconds++;
+          const mins = Math.floor(voipSeconds / 60).toString().padStart(2, '0');
+          const secs = (voipSeconds % 60).toString().padStart(2, '0');
+          document.getElementById('voipCallStatus').innerText = `Connected (${mins}:${secs})`;
+        }, 1000);
+
+        showToast("Call Answered. Direct VoIP Active.");
+      }, 3000);
+    }
+
+    function endInAppVoipCall() {
+      // Clear timers
+      if (voipTimerInterval) {
+        clearInterval(voipTimerInterval);
+        voipTimerInterval = null;
+      }
+      document.getElementById('voipCallOverlay').classList.add('hidden');
+      
+      // Hide unread message warnings since call bypassed it
+      document.getElementById('unreadVoipPrompt').classList.add('hidden');
+      showToast("Call Disconnected.");
+    }
+
+    function toggleVoipMute(button) {
+      isVoipMuted = !isVoipMuted;
+      const iconContainer = button.querySelector('div');
+      if (isVoipMuted) {
+        iconContainer.className = "p-3.5 bg-red-500/20 text-red-400 rounded-full transition-all active:scale-95 shadow-md flex items-center justify-center border border-red-500/40";
+        showToast("Microphone muted.");
+      } else {
+        iconContainer.className = "p-3.5 bg-white/10 hover:bg-white/20 rounded-full text-stone-200 transition-all active:scale-95 shadow-md flex items-center justify-center";
+        showToast("Microphone active.");
+      }
+    }
+
+    function toggleVoipSpeaker(button) {
+      isVoipSpeakerActive = !isVoipSpeakerActive;
+      const iconContainer = button.querySelector('div');
+      if (isVoipSpeakerActive) {
+        iconContainer.className = "p-3.5 bg-emerald-500/20 text-emerald-400 rounded-full transition-all active:scale-95 shadow-md flex items-center justify-center border border-emerald-500/40";
+        showToast("Speakerphone enabled.");
+      } else {
+        iconContainer.className = "p-3.5 bg-white/10 hover:bg-white/20 rounded-full text-stone-200 transition-all active:scale-95 shadow-md flex items-center justify-center";
+        showToast("Speakerphone disabled.");
+      }
+    }
+
+    // Modal Outstanding Quote Drafter logic
+    function openQuoteDrafter(bookingId) {
+      selectedBookingQuoteId = bookingId;
+      document.getElementById('quoteDrafterModal').classList.remove('hidden');
+      updateDraftSumTotals();
+    }
+
+    function closeQuoteDrafter() {
+      document.getElementById('quoteDrafterModal').classList.add('hidden');
+    }
+
+    // Adapt layout invoice cost values
+    function updateDraftSumTotals() {
+      const laborCost = parseFloat(document.getElementById('draftLaborCost').value) || 0;
+      const taxRate = parseFloat(document.getElementById('draftTaxRate').value) || 0;
+
+      const sst = laborCost * (taxRate / 100);
+      const subtotal = laborCost;
+      const outstanding = (subtotal + sst) - 50.00; // Automatically subtracts the non-refundable RM50 callout fee!
+
+      document.getElementById('draftSubtotalText').innerText = `RM ${subtotal.toFixed(2)}`;
+      document.getElementById('draftSstText').innerText = `RM ${sst.toFixed(2)}`;
+      document.getElementById('draftOutstandingText').innerText = `RM ${outstanding.toFixed(2)}`;
+    }
+
+    function sendDraftedQuoteToResident() {
+      // Find and update database parameters
+      const currentProfile = vendorDb.profiles[vendorDb.activeVendor];
+      const booking = currentProfile.bookings.find(b => b.id === selectedBookingQuoteId);
+      if (booking) {
+        booking.status = "Quoted";
+        booking.costEstimate = `RM ${document.getElementById('draftOutstandingText').innerText} outstanding`;
+      }
+
+      showToast("Quotation submitted directly to Sarah's resident feed!");
+      closeQuoteDrafter();
+      renderActiveBookings();
+    }
+
+    function showInvoicePaidReceipt(bookingId) {
+      showToast("Invoice RM216.00 fully paid by resident via secure Fiuu portal.");
+    }
+
+    // ==============================================
+    // SIMULATOR CONTROLS EVENT HANDLERS
+    // ==============================================
+    
+    // 1. Simulate Reschedule Requested by resident (Sarah)
+    function triggerSimulatedReschedule() {
+      // Ensure we are viewing Pak Abu Plumbing to make it visible
+      changeActiveVendor('Pak Abu Plumbing');
+      switchTab('jobs');
+
+      const booking = vendorDb.profiles['Pak Abu Plumbing'].bookings.find(b => b.id === 'plumbing-1');
+      if (booking) {
+        booking.rescheduleRequest = {
+          proposedTime: '19 May, 10:00 AM',
+          status: 'pending'
+        };
+        renderActiveBookings();
+        showToast("Sarah requested to reschedule. Banner active!");
+      }
+    }
+
+    // 2. Approve Reschedule (Triggers both party agreement & updates card detail)
+    function approveReschedule(bookingId) {
+      const booking = vendorDb.profiles[vendorDb.activeVendor].bookings.find(b => b.id === bookingId);
+      if (booking && booking.rescheduleRequest) {
+        const approvedTime = booking.rescheduleRequest.proposedTime;
+        booking.schedule = approvedTime; // Update actual booking time
+        booking.rescheduleRequest.status = 'approved';
+        
+        renderActiveBookings();
+        showToast(`Reschedule Confirmed! Updated to ${approvedTime}`);
+
+        // Post automated agreement confirm into Chat Hub log
+        commentThreads = commentThreads || {};
+        const chatChanMsg = document.getElementById('chatChannelLastMsg');
+        if (chatChanMsg) {
+          chatChanMsg.innerText = `Booking schedule modified to ${approvedTime} by mutual agreement.`;
+        }
+      }
+    }
+
+    // 3. Decline Reschedule
+    function rejectReschedule(bookingId) {
+      const booking = vendorDb.profiles[vendorDb.activeVendor].bookings.find(b => b.id === bookingId);
+      if (booking) {
+        booking.rescheduleRequest = null;
+        renderActiveBookings();
+        showToast("Reschedule request declined. Original slot kept.");
+      }
+    }
+
+    // 4. Simulate Push Notification reminder
+    function triggerSimulatedReminder() {
+      const banner = document.getElementById('pushNotificationBanner');
+      banner.classList.remove('hidden');
+      showToast("Reminder Banner Slid Down!");
+    }
+
+    function dismissPushBanner() {
+      document.getElementById('pushNotificationBanner').classList.add('hidden');
+    }
+
+    function markVendorOnMyWay() {
+      dismissPushBanner();
+      showToast("Resident notified: You are marked 'On My Way'.");
+    }
+
+    // 5. Simulate Missed Appointment Lateness siren/alarm
+    function triggerSimulatedAlarm() {
+      changeActiveVendor('Pak Abu Plumbing');
+      switchTab('jobs');
+      
+      const alarmOverlay = document.getElementById('emergencyAlarmOverlay');
+      alarmOverlay.classList.remove('hidden');
+      alarmOverlay.classList.add('alarm-active');
+      
+      // Update background warning class in list card for complete visual alert integration
+      renderActiveBookings();
+    }
+
+    function emergencyCallResident() {
+      document.getElementById('emergencyAlarmOverlay').classList.add('hidden');
+      document.getElementById('emergencyAlarmOverlay').classList.remove('alarm-active');
+      renderActiveBookings();
+      startInAppVoipCall();
+    }
+
+    function reportDelayToConcierge() {
+      document.getElementById('emergencyAlarmOverlay').classList.add('hidden');
+      document.getElementById('emergencyAlarmOverlay').classList.remove('alarm-active');
+      renderActiveBookings();
+      showToast("Delay reported. Sarah has been notified.");
+    }
+
+    function resolveLatenessAlarm() {
+      document.getElementById('emergencyAlarmOverlay').classList.add('hidden');
+      document.getElementById('emergencyAlarmOverlay').classList.remove('alarm-active');
+      renderActiveBookings();
+      showToast("Attendance confirmed! Alarm resolved successfully.");
+    }
+
+    // Theme Switcher
+    function toggleTheme() {
+      const appFrame = document.getElementById('appFrame');
+      const sunIcon = document.getElementById('theme-sun-icon');
+      const moonIcon = document.getElementById('theme-moon-icon');
+      
+      if (currentTheme === 'dark') {
+        appFrame.classList.add('light-mode');
+        sunIcon.classList.add('hidden');
+        moonIcon.classList.remove('hidden');
+        currentTheme = 'light';
+        showToast("Switched to Light Mode! ☀️");
+      } else {
+        appFrame.classList.remove('light-mode');
+        sunIcon.classList.remove('hidden');
+        moonIcon.classList.add('hidden');
+        currentTheme = 'dark';
+        showToast("Switched to Dark Mode! 🌙");
+      }
+      
+      // Force refresh active layout list
+      renderActiveBookings();
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toastMessage');
+      if (toast) {
+        const toastText = document.getElementById('toastText');
+        if (toastText) {
+          toastText.innerText = message;
+        }
+        toast.classList.remove('hidden');
+        setTimeout(() => toast.classList.add('hidden'), 2500);
+      }
+    }
+  </script>
+</body>
+</html>
