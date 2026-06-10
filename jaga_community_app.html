@@ -1,0 +1,2354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JaGa+ | Light & Dark Mode Hybrid Integration</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Custom Fonts (Outfit/Jakarta) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+      background-color: #070805;
+      color: #f3f4f6;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    :root {
+      --color-bg-dark: #0c0e08;
+      --color-brand-pink: #ff4d6d;
+      --color-brand-pink-glow: rgba(255, 77, 109, 0.35);
+      --color-olive-card: rgba(26, 29, 19, 0.75);
+    }
+
+    /* Universal Theme Transition */
+    .theme-transition {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, background-image 0.3s ease;
+    }
+
+    .brand-glow {
+      box-shadow: 0 0 20px var(--color-brand-pink-glow);
+    }
+
+    /* Selection Highlight matching Duolingo style */
+    .wizard-card-selected {
+      border-color: #ff4d6d !important;
+      background-color: rgba(255, 77, 109, 0.12) !important;
+    }
+    .wizard-card-selected h4, 
+    .wizard-card-selected p, 
+    .wizard-card-selected span {
+      color: #ff4d6d !important;
+    }
+
+    .light-mode .wizard-card-selected {
+      border-color: #ff4d6d !important;
+      background-color: rgba(255, 77, 109, 0.08) !important;
+      box-shadow: 0 0 10px rgba(255, 77, 109, 0.15) !important;
+    }
+
+    /* Swipe animations for Tinder Mode */
+    .swipe-left {
+      transform: translateX(-150%) rotate(-15deg);
+      opacity: 0;
+      transition: all 0.4s ease-out;
+    }
+    .swipe-right {
+      transform: translateX(150%) rotate(15deg);
+      opacity: 0;
+      transition: all 0.4s ease-out;
+    }
+
+    /* Floating Heart Animation */
+    @keyframes floatUpHeart {
+      0% {
+        transform: translateY(0) scale(0.8);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-120px) scale(1.4) rotate(15deg);
+        opacity: 0;
+      }
+    }
+    .heart-bubble {
+      position: absolute;
+      animation: floatUpHeart 0.8s ease-out forwards;
+      pointer-events: none;
+    }
+
+    /* Hide scrollbars but keep functionality */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* ==========================================================
+       THEME SPECIFIC STYLES OVERRIDES FOR APP FRAME
+       ========================================================== */
+    
+    /* Default Dark Mode Classes */
+    .theme-frame {
+      background-color: #0c0e08;
+      color: #f3f4f6;
+    }
+    .theme-header {
+      background-color: #0c0e08;
+      border-color: #222916;
+    }
+    .theme-ticker {
+      background-color: #171b0e;
+      border-color: #2b331b;
+      color: #b4c498;
+    }
+    .theme-card {
+      background-color: #12160a;
+      border-color: #232b14;
+    }
+    .theme-card-secondary {
+      background-color: #1c2211;
+      border-color: #2e371b;
+    }
+    .theme-text-light {
+      color: #f3f4f6;
+    }
+    .theme-text-muted {
+      color: #a8a29e;
+    }
+    .theme-btn-secondary {
+      background-color: #1b2110;
+      border-color: #303c1c;
+      color: #9fc759;
+    }
+    .theme-sub-bar {
+      background-color: #12160a;
+      border-color: #2b331c;
+    }
+    .theme-input {
+      background-color: #1a1f10;
+      color: #e2e8f0;
+      border-color: #2d381c;
+    }
+
+    /* Clean Card Component Theme Overrides */
+    .theme-welcome-banner {
+      background: linear-gradient(to right, #171b10, #0d0e09);
+      border-color: #2b331c;
+    }
+    .theme-gateway-callout {
+      background: linear-gradient(to bottom right, #1c1214, #12160a);
+      border-color: rgba(255, 77, 109, 0.25);
+    }
+    .theme-featured-ad {
+      background: linear-gradient(to bottom right, #1b1911, #12160a);
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+    .theme-gift-badge {
+      background-color: #1c2014;
+      border-color: rgba(255, 77, 109, 0.25);
+    }
+    .theme-date-block {
+      background-color: #1b2210;
+      border-color: #2f3b1b;
+    }
+    .theme-unit-badge {
+      background-color: #2a301d;
+      border-color: #3e472d;
+      color: #e2e8f0;
+    }
+    .theme-btn-action {
+      background-color: #1c2211;
+      border-color: #2e371b;
+      color: #e2e8f0;
+    }
+
+    /* Date Spans styling */
+    .theme-date-block span:first-child { color: #9fc759; }
+    .theme-date-block span:last-child { color: #f3f4f6; }
+
+    /* Progress Track Theme Overrides */
+    .theme-progress-track {
+      background-color: #171b0e;
+    }
+    .light-mode .theme-progress-track {
+      background-color: #cbd5e1 !important;
+    }
+
+    /* SST Summary Box Theme Overrides */
+    .theme-sst-box {
+      background-color: rgba(245, 158, 11, 0.05);
+      border-color: rgba(245, 158, 11, 0.2);
+    }
+    .light-mode .theme-sst-box {
+      background-color: #fef3c7 !important;
+      border-color: #f59e0b !important;
+    }
+
+    /* Tinder Swipe deck and card styling */
+    #nearby-swipe-area {
+      background-color: #0f1109;
+      border-color: rgba(255, 77, 109, 0.2);
+    }
+    .light-mode #nearby-swipe-area {
+      background-color: #f1f5f9 !important;
+      border-color: #cbd5e1 !important;
+    }
+
+    .swipe-card {
+      background-color: #12160a;
+      border-color: #232b14;
+      color: #f3f4f6;
+    }
+    .light-mode .swipe-card {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #1e293b !important;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02) !important;
+    }
+    .light-mode .swipe-card h3 {
+      color: #0f172a !important;
+    }
+    .light-mode .swipe-card p {
+      color: #334155 !important;
+    }
+    .light-mode .swipe-card span {
+      color: #475569 !important;
+    }
+
+    /* AI Scanning Laser Effect */
+    @keyframes laser-scan {
+      0%, 100% { top: 0%; opacity: 0.8; }
+      50% { top: 100%; opacity: 0.8; }
+    }
+    .scanner-line {
+      animation: laser-scan 2s linear infinite;
+    }
+
+    /* ==========================================================
+       Light Mode Overrides (Triggered when wrapper has .light-mode)
+       ========================================================== */
+    .light-mode.theme-frame {
+      background-color: #f8fafc;
+      color: #1e293b;
+    }
+    .light-mode .theme-header {
+      background-color: #ffffff;
+      border-color: #e2e8f0;
+    }
+    .light-mode .theme-ticker {
+      background-color: #f1f5f9;
+      border-color: #e2e8f0;
+      color: #475569;
+    }
+    .light-mode .theme-card {
+      background-color: #ffffff;
+      border-color: #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+    .light-mode .theme-card-secondary {
+      background-color: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+    .light-mode .theme-text-light {
+      color: #1e293b;
+    }
+    .light-mode .theme-text-muted {
+      color: #64748b;
+    }
+    .light-mode .theme-btn-secondary {
+      background-color: #f1f5f9;
+      border-color: #cbd5e1;
+      color: #ff4d6d;
+    }
+    .light-mode .theme-sub-bar {
+      background-color: #f8fafc;
+      border-color: #e2e8f0;
+    }
+    .light-mode .theme-input {
+      background-color: #f1f5f9;
+      color: #1e293b;
+      border-color: #cbd5e1;
+    }
+    .light-mode .theme-modal-bg {
+      background-color: rgba(255, 255, 255, 0.98) !important;
+    }
+
+    /* Card Component overrides in Light Mode */
+    .light-mode .theme-welcome-banner {
+      background: linear-gradient(to right, #f1f5f9, #e2e8f0);
+      border-color: #cbd5e1;
+    }
+    .light-mode .theme-welcome-banner h3 {
+      color: #0f172a;
+    }
+    .light-mode .theme-welcome-banner p {
+      color: #475569;
+    }
+    .light-mode .theme-gateway-callout {
+      background: linear-gradient(to bottom right, #fff1f2, #fdf2f4);
+      border-color: rgba(255, 77, 109, 0.35);
+    }
+    .light-mode .theme-featured-ad {
+      background: linear-gradient(to bottom right, #fffbeb, #fef3c7);
+      border-color: rgba(245, 158, 11, 0.35);
+    }
+    .light-mode .theme-featured-ad h3,
+    .light-mode .theme-featured-ad p {
+      color: #1e293b;
+    }
+    .light-mode .theme-gift-badge {
+      background-color: #fff1f2;
+      border-color: rgba(255, 77, 109, 0.3);
+    }
+    .light-mode .theme-gift-badge h4 {
+      color: #1e293b;
+    }
+    .light-mode .theme-date-block {
+      background-color: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+    .light-mode .theme-date-block span:first-child {
+      color: #ff4d6d;
+    }
+    .light-mode .theme-date-block span:last-child {
+      color: #1e293b;
+    }
+    .light-mode .theme-unit-badge {
+      background-color: #f1f5f9;
+      border-color: #cbd5e1;
+      color: #334155;
+    }
+    .light-mode .theme-btn-action {
+      background-color: #f1f5f9;
+      border-color: #cbd5e1;
+      color: #334155;
+    }
+    .light-mode .theme-btn-action:hover {
+      background-color: #e2e8f0;
+    }
+  </style>
+</head>
+<body class="flex justify-center items-center min-h-screen p-0 sm:p-4 bg-gradient-to-br from-[#0c0e08] via-[#14180d] to-[#070805]">
+
+  <!-- Main Device Mockup Frame -->
+  <div id="appFrame" class="theme-frame theme-transition relative w-full max-w-md h-[92vh] sm:h-[840px] rounded-none sm:rounded-[40px] border-0 sm:border-8 border-[#1f2415] shadow-2xl flex flex-col overflow-hidden">
+    
+    <!-- Simulated Status Bar -->
+    <div class="px-6 pt-3 pb-1 flex justify-between items-center text-xs text-stone-400 select-none z-30 theme-transition">
+      <span class="font-bold">6:12</span>
+      <div class="hidden sm:block absolute left-1/2 transform -translate-x-1/2 top-2 w-24 h-4 bg-black rounded-full"></div>
+      <div class="flex items-center space-x-1">
+        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.17 19.58 10.53 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
+        <span class="font-medium">LTE</span>
+      </div>
+    </div>
+
+    <!-- App Header -->
+    <div class="theme-header theme-transition px-5 py-3 border-b flex justify-between items-center z-30 shadow-md">
+      <div class="flex items-center space-x-2">
+        <div class="flex items-center">
+          <span class="text-xl font-black tracking-wider theme-text-light theme-transition">JaGa</span>
+          <span class="text-xl font-bold text-[#ff4d6d] drop-shadow-[0_0_8px_rgba(255,77,109,0.5)]">+</span>
+        </div>
+        <!-- Location Switcher Dropdown -->
+        <div class="relative">
+          <button id="locDropdownBtn" class="flex items-center space-x-1 theme-card-secondary theme-transition text-xs px-2.5 py-1 rounded-full border">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#ff4d6d] animate-pulse"></span>
+            <span id="currentLocText" class="font-semibold theme-text-light">Changkat View</span>
+            <svg class="w-3 h-3 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          
+          <div id="locDropdown" class="hidden absolute top-7 left-0 w-44 bg-[#14180d] border border-[#2b321c] rounded-xl shadow-2xl overflow-hidden z-50">
+            <button onclick="changeLocation('Changkat View')" class="w-full text-left px-3.5 py-2 text-xs text-stone-200 hover:bg-[#1f2414] font-medium transition-colors border-b border-[#202715]">Changkat View</button>
+            <button onclick="changeLocation('Mont Kiara Pines')" class="w-full text-left px-3.5 py-2 text-xs text-stone-300 hover:bg-[#1f2414] font-medium transition-colors border-b border-[#202715]">Mont Kiara Pines</button>
+            <button onclick="changeLocation('Duta Nusantara')" class="w-full text-left px-3.5 py-2 text-xs text-stone-300 hover:bg-[#1f2414] font-medium transition-colors">Duta Nusantara</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Theme Toggle & Premium Upsell Hub Controls -->
+      <div class="flex items-center space-x-2">
+        
+        <!-- Light/Dark Theme Switcher Button -->
+        <button onclick="toggleTheme()" class="p-1.5 rounded-full border theme-card-secondary theme-transition text-[#ff4d6d] hover:scale-105 active:scale-95 transition-all shadow-sm" title="Toggle Light/Dark Theme">
+          <!-- Sun Icon -->
+          <svg id="theme-sun-icon" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+          </svg>
+          <!-- Moon Icon -->
+          <svg id="theme-moon-icon" class="hidden w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
+        </button>
+
+        <button onclick="openPremiumTab()" class="flex items-center space-x-1 bg-gradient-to-r from-stone-900 to-[#1a1d13] border border-[#ff4d6d]/40 rounded-full px-2 py-0.5 hover:border-[#ff4d6d] transition-all">
+          <span class="text-[9px] tracking-wider font-extrabold text-[#ff4d6d] uppercase">J+ Premium</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Neighborhood Live Ticker -->
+    <div class="theme-ticker theme-transition py-1.5 px-4 overflow-hidden border-b flex items-center space-x-2 text-[11px] select-none">
+      <span class="flex h-2 w-2 relative">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff4d6d] opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-[#ff4d6d]"></span>
+      </span>
+      <div class="flex-1 overflow-hidden relative h-4">
+        <div id="tickerTrack" class="absolute flex flex-col transition-all duration-500 ease-in-out top-0">
+          <span class="h-4">Sarah recommended the basement Nasi Lemak!</span>
+          <span class="h-4">3 residents booked Rooftop Badminton court today.</span>
+          <span class="h-4">Uncle Lim added freshly baked Pineapple Tarts!</span>
+          <span class="h-4">Pak Din Locksmith got a 5-star rating from Unit A-12!</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCROLL CONTAINER FOR THE HYBRID INTEGRATION -->
+    <div id="mainContentScroll" class="flex-1 overflow-y-auto relative no-scrollbar">
+      
+      <!-- ==============================================
+           TAB 1: HOME (SMART UTILITY + COMMUNITY HIGHLIGHTS)
+           ============================================== -->
+      <div id="view-home" class="tab-view py-4 px-4 space-y-5">
+        
+        <!-- Premium Condo Welcome Banner -->
+        <div class="theme-welcome-banner theme-transition border rounded-2xl p-4 flex items-center justify-between shadow-sm">
+          <div>
+            <h3 class="text-sm font-extrabold theme-text-light theme-transition">Welcome Back, Unit B-08</h3>
+            <p class="text-[10px] text-[#9fc759] font-semibold mt-0.5">Management account is active</p>
+          </div>
+          <span class="theme-unit-badge theme-transition text-xs font-bold px-3 py-1.5 rounded-xl border">Block B</span>
+        </div>
+
+        <!-- "JaGa+ Community" Gateway Callout (Right inside Home screen!) -->
+        <div class="theme-gateway-callout theme-transition border rounded-2xl p-4 space-y-3 relative overflow-hidden shadow-lg">
+          <div class="absolute -right-8 -top-8 w-24 h-24 bg-[#ff4d6d]/10 rounded-full blur-2xl pointer-events-none"></div>
+          <div class="flex justify-between items-center">
+            <span class="bg-[#ff4d6d]/15 text-[#ff4d6d] text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-wider">COMMUNITY PLATFORM</span>
+            <span class="text-[10px] theme-text-muted font-semibold">Active Neighbors: 142</span>
+          </div>
+          <div class="space-y-1">
+            <h4 class="text-xs font-bold theme-text-light">See what's happening downstairs right now! 💬</h4>
+            <p class="text-[11px] theme-text-muted leading-relaxed">Sarah just posted about the basement Nasi Lemak uncle. Join the community discussion!</p>
+          </div>
+          <button onclick="triggerCentralButton()" class="w-full bg-[#ff4d6d] hover:bg-[#ff5d7b] text-white text-xs font-extrabold py-2.5 rounded-xl transition-all flex items-center justify-center space-x-1.5 brand-glow">
+            <span>Open JaGa+ Feed</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+
+        <!-- Classic JaGaApp Core Quick Actions Dashboard -->
+        <div class="space-y-2.5">
+          <h4 class="text-[10px] font-extrabold uppercase tracking-widest theme-text-muted">Property Utilities</h4>
+          <div class="grid grid-cols-4 gap-3 text-center">
+            <!-- Action 1 -->
+            <div onclick="showToast('Loading Visitor Registration...')" class="theme-card hover:border-slate-400 theme-transition border p-3 rounded-2xl cursor-pointer flex flex-col items-center space-y-1.5">
+              <div class="p-2 bg-[#ff4d6d]/10 rounded-xl text-[#ff4d6d]">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+              </div>
+              <span class="text-[10px] font-bold theme-text-light">Invite Visitor</span>
+            </div>
+            <!-- Action 2 -->
+            <div onclick="showToast('Opening Bills Portal...')" class="theme-card hover:border-slate-400 theme-transition border p-3 rounded-2xl cursor-pointer flex flex-col items-center space-y-1.5">
+              <div class="p-2 bg-amber-500/10 rounded-xl text-amber-500">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              </div>
+              <span class="text-[10px] font-bold theme-text-light">Pay Bills</span>
+            </div>
+            <!-- Action 3 -->
+            <div onclick="showToast('Loading Facility Bookings...')" class="theme-card hover:border-slate-400 theme-transition border p-3 rounded-2xl cursor-pointer flex flex-col items-center space-y-1.5">
+              <div class="p-2 bg-[#9fc759]/10 rounded-xl text-[#9fc759]">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+              </div>
+              <span class="text-[10px] font-bold theme-text-light">Facilities</span>
+            </div>
+            <!-- Action 4 -->
+            <div onclick="showToast('Calling Guardhouse Intercom...')" class="theme-card hover:border-slate-400 theme-transition border p-3 rounded-2xl cursor-pointer flex flex-col items-center space-y-1.5">
+              <div class="p-2 bg-indigo-500/10 rounded-xl text-indigo-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+              </div>
+              <span class="text-[10px] font-bold theme-text-light">Intercom</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fast Shortcut to Active Calendar Events -->
+        <div class="space-y-3">
+          <div class="flex justify-between items-center">
+            <h4 class="text-[10px] font-extrabold uppercase tracking-widest theme-text-muted">Upcoming Events</h4>
+            <button onclick="triggerCentralButton('events')" class="text-xs text-[#ff4d6d] font-bold hover:underline">View Calendar</button>
+          </div>
+          <!-- Sample Mini Event Row -->
+          <div class="theme-card theme-transition border rounded-2xl p-3 flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-[#ff4d6d]/10 flex flex-col items-center justify-center text-[#ff4d6d] shrink-0 border border-[#ff4d6d]/20">
+              <span class="text-[9px] font-extrabold uppercase">MAY</span>
+              <span class="text-xs font-black">17</span>
+            </div>
+            <div class="flex-1">
+              <p class="text-xs font-bold theme-text-light">Rooftop Badminton Tournament</p>
+              <p class="text-[10px] theme-text-muted">Changkat Court • 10:00 AM</p>
+            </div>
+            <button onclick="triggerCentralButton('events')" class="theme-btn-secondary theme-transition text-[10px] font-bold px-3 py-1.5 rounded-xl border">RSVP</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ==============================================
+           TAB 2: MARKET (HYPERLOCAL DISCOVERY / NEARBY)
+           ============================================== -->
+      <div id="view-market" class="tab-view hidden py-4 px-4 space-y-4">
+        
+        <div class="flex justify-between items-center mb-1">
+          <div>
+            <h2 class="text-sm font-extrabold tracking-wide uppercase theme-text-muted">Hyperlocal Discovery</h2>
+            <p class="text-[11px] theme-text-muted font-medium">Local vendors within 1km rated by neighbors</p>
+          </div>
+          <div class="flex theme-sub-bar theme-transition p-0.5 rounded-lg border text-xs">
+            <button onclick="setNearbyLayout('grid')" id="nearby-grid-btn" class="px-2.5 py-1 rounded-md font-semibold text-white bg-[#ff4d6d]">List</button>
+            <button onclick="setNearbyLayout('swipe')" id="nearby-swipe-btn" class="px-2.5 py-1 rounded-md font-semibold theme-text-muted flex items-center space-x-1">
+              <span>Swipe Match</span>
+              <span class="bg-[#ff4d6d] w-1.5 h-1.5 rounded-full animate-ping"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter Sub-header -->
+        <div class="flex space-x-2 overflow-x-auto pb-1.5 select-none no-scrollbar">
+          <button class="bg-[#ff4d6d] text-white text-[10px] font-extrabold px-3 py-1.5 rounded-full whitespace-nowrap">All Vendors</button>
+          <button class="theme-card-secondary theme-transition theme-text-light text-[10px] font-semibold px-3 py-1.5 rounded-full border whitespace-nowrap">Home Services</button>
+          <button class="theme-card-secondary theme-transition theme-text-light text-[10px] font-semibold px-3 py-1.5 rounded-full border whitespace-nowrap">Food & Dining</button>
+        </div>
+
+        <!-- Layout A: List Grid View -->
+        <div id="nearby-grid-area" class="space-y-3">
+          
+          <!-- FEATURED NATIVE AD SLOT (BateriHub at top) -->
+          <div class="theme-featured-ad theme-transition border rounded-2xl p-4 space-y-3 relative overflow-hidden">
+            <span class="absolute top-0 right-0 bg-amber-500 text-stone-950 text-[8px] font-black px-2.5 py-1 rounded-bl-xl tracking-wider uppercase">FEATURED</span>
+            
+            <div class="flex space-x-3.5">
+              <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500 font-extrabold text-lg">BH</div>
+              <div class="flex-1">
+                <div class="flex items-center space-x-1.5">
+                  <h3 class="text-xs font-bold theme-text-light">BateriHub Changkat</h3>
+                  <span class="text-[10px] text-amber-400 font-bold flex items-center">★ 4.9</span>
+                </div>
+                <p class="text-[10px] theme-text-muted">0.5km away • Used by 54 neighbours</p>
+              </div>
+            </div>
+
+            <p class="text-xs theme-text-muted leading-relaxed">
+              Car battery dead? Get instant assistance within <span class="text-amber-400 font-bold">15 minutes</span> right inside Changkat View carpark! Exclusive pricing for JaGa+ members.
+            </p>
+
+            <div class="flex justify-between items-center pt-2.5 border-t border-amber-500/20">
+              <span class="text-[10px] text-[#9fc759] font-black">⚡ Verified Partner Warranty Included</span>
+              <button onclick="startBookingChat('BateriHub Changkat', 'Hello, my car won\'t start in the basement.')" class="bg-amber-500 hover:bg-amber-400 text-stone-950 text-[11px] font-black px-3.5 py-1.5 rounded-xl transition-all">
+                Quick Message
+              </button>
+            </div>
+          </div>
+
+          <!-- NEW: Pak Abu Plumbing (Demonstrates optimized computer-vision AI flow) -->
+          <div class="theme-card theme-transition border rounded-2xl p-4 flex justify-between items-center hover:border-slate-400">
+            <div class="space-y-1.5 max-w-[70%]">
+              <div class="flex items-center space-x-2">
+                <h3 class="text-xs font-bold theme-text-light">Pak Abu Plumbing</h3>
+                <span class="bg-[#ff4d6d]/15 text-[#ff4d6d] text-[8px] font-extrabold px-1.5 py-0.5 rounded uppercase">⚡ AI Scan Active</span>
+              </div>
+              <p class="text-[10px] theme-text-muted">0.5km away • Rating: <span class="theme-text-light font-bold">4.9 ★</span></p>
+              <p class="text-[11px] theme-text-muted">Leaks, clogs, burst pipes. Skip manual gatekeeper waiting with our instant photo scanner.</p>
+            </div>
+            <button onclick="openBookingWizard('Pak Abu Plumbing')" class="bg-[#ff4d6d] hover:bg-[#ff5d7b] text-white text-[11px] font-bold px-3.5 py-2 rounded-xl transition-all">
+              Book
+            </button>
+          </div>
+
+          <!-- Neighbor Vetted Locksmith -->
+          <div class="theme-card theme-transition border rounded-2xl p-4 flex justify-between items-center hover:border-slate-400">
+            <div class="space-y-1.5 max-w-[70%]">
+              <div class="flex items-center space-x-2">
+                <h3 class="text-xs font-bold theme-text-light">Pak Din Locksmith</h3>
+                <span class="bg-[#ff4d6d]/10 text-[#ff4d6d] text-[8px] font-extrabold px-1.5 py-0.5 rounded uppercase">Vetted</span>
+              </div>
+              <p class="text-[10px] theme-text-muted">0.8km away • Rating: <span class="theme-text-light font-bold">4.8 ★</span></p>
+              <p class="text-[11px] theme-text-muted">Used by 12 neighbours in your block. "Very fast, opened locked grill in 10 mins."</p>
+            </div>
+            <button onclick="openBookingWizard('Pak Din Locksmith')" class="bg-[#ff4d6d] hover:bg-[#ff5d7b] text-white text-[11px] font-bold px-3.5 py-2 rounded-xl transition-all">
+              Book
+            </button>
+          </div>
+
+          <!-- Neighbor Vetted Aircon Ah Beng -->
+          <div class="theme-card theme-transition border rounded-2xl p-4 flex justify-between items-center hover:border-slate-400">
+            <div class="space-y-1.5 max-w-[70%]">
+              <div class="flex items-center space-x-2">
+                <h3 class="text-xs font-bold theme-text-light">Ah Beng Aircon Pak</h3>
+                <span class="bg-[#ff4d6d]/10 text-[#ff4d6d] text-[8px] font-extrabold px-1.5 py-0.5 rounded uppercase">Vetted</span>
+              </div>
+              <p class="text-[10px] theme-text-muted">1.2km away • Rating: <span class="theme-text-light font-bold">4.6 ★</span></p>
+              <p class="text-[11px] theme-text-muted">Fast aircon cleaning, sanitizing & diagnostics. Secure immediate slots inside app.</p>
+            </div>
+            <button onclick="openBookingWizard('Ah Beng Aircon Pak')" class="bg-[#ff4d6d] hover:bg-[#ff5d7b] text-white text-[11px] font-bold px-3.5 py-2 rounded-xl transition-all">
+              Book
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Layout B: Tinder-style Swipe Discovery Mode -->
+        <div id="nearby-swipe-area" class="hidden relative h-[520px] rounded-3xl overflow-hidden flex flex-col items-center justify-center border p-4 shadow-inner theme-transition">
+          <div class="absolute inset-0 bg-[#0f1109] opacity-40 select-none pointer-events-none"></div>
+
+          <!-- Dynamic Cards Container -->
+          <div id="swipe-card-deck" class="relative w-full h-[400px] flex justify-center items-center">
+            <div class="text-center p-8 space-y-2 z-10 text-stone-400">
+              <p class="text-sm font-bold">Initializing swipe deck...</p>
+            </div>
+          </div>
+
+          <!-- Interactive Action Buttons -->
+          <div class="flex space-x-6 z-20 mt-4">
+            <button onclick="swipeAction('left')" class="p-4 bg-stone-900 border border-red-500/40 rounded-full hover:bg-red-500/10 text-red-500 transition-all active:scale-90 shadow-lg">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+            
+            <button onclick="bookingActionFromSwipe()" class="p-3.5 bg-gradient-to-tr from-[#ff4d6d] to-rose-400 rounded-xl text-stone-950 font-extrabold text-xs px-5 shadow-lg flex items-center space-x-1.5 active:scale-95">
+              <span>Book Service</span>
+            </button>
+
+            <button onclick="swipeAction('right')" class="p-4 bg-stone-900 border border-green-500/40 rounded-full hover:bg-green-500/10 text-green-500 transition-all active:scale-90 shadow-lg">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+            </button>
+          </div>
+
+          <span class="text-[10px] text-stone-300 font-bold mt-2.5 z-20 select-none">Swipe Right to add to neighborhood shortlists!</span>
+        </div>
+
+      </div>
+
+      <!-- ==============================================
+           TAB 3: CENTRAL BUTTON ENTRY (FEED & EVENTS SOCIAL HUB)
+           ============================================== -->
+      <div id="view-jagaplus-social" class="tab-view hidden py-4 px-4 space-y-4">
+        
+        <!-- Toggle Subtabs for Feed and Events Calendar -->
+        <div class="flex justify-between items-center mb-1 theme-sub-bar theme-transition p-1 rounded-xl border">
+          <button onclick="setSocialSubTab('feed')" id="subtab-social-feed" class="flex-1 text-center py-2 text-xs font-black tracking-wide uppercase rounded-lg text-white bg-[#ff4d6d]">
+            Neighbourhood Feed
+          </button>
+          <button onclick="setSocialSubTab('events')" id="subtab-social-events" class="flex-1 text-center py-2 text-xs font-extrabold tracking-wide uppercase rounded-lg theme-text-muted hover:text-white transition-all">
+            Events Calendar
+          </button>
+        </div>
+
+        <!-- SUB-TAB A: NEIGHBOURHOOD FEED CONTENT -->
+        <div id="social-feed-section" class="space-y-4">
+          <!-- Feed Mode Switcher -->
+          <div class="flex justify-between items-center">
+            <span class="text-[10px] font-extrabold tracking-wide uppercase theme-text-muted">Live Building Stories</span>
+            <div class="flex theme-sub-bar theme-transition p-0.5 rounded-lg border text-xs">
+              <button onclick="setFeedLayout('classic')" id="layout-classic-btn" class="px-2.5 py-0.5 rounded-md font-semibold text-white bg-[#ff4d6d]">Wall</button>
+              <button onclick="setFeedLayout('tiktok')" id="layout-tiktok-btn" class="px-2.5 py-0.5 rounded-md font-semibold theme-text-muted">Pulse Scroll</button>
+            </div>
+          </div>
+
+          <!-- Quick Post Box -->
+          <div class="theme-card theme-transition border rounded-2xl p-3 flex items-center space-x-3 shadow-lg">
+            <div class="w-8 h-8 rounded-full bg-[#ff4d6d]/20 border border-[#ff4d6d]/40 flex items-center justify-center text-xs font-bold text-[#ff4d6d]">YOU</div>
+            <input type="text" placeholder="Recommend a local gem..." class="flex-1 theme-input theme-transition border rounded-xl px-3 py-2 text-xs placeholder-stone-500 focus:ring-1 focus:ring-[#ff4d6d] outline-none">
+            <button class="bg-[#ff4d6d] hover:bg-[#ff5d7b] text-white p-1.5 rounded-xl transition-all">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            </button>
+          </div>
+
+          <!-- Feed Posts List -->
+          <div id="feed-items-container" class="space-y-4">
+            <!-- Sarah Nasi Lemak -->
+            <div class="theme-card theme-transition border rounded-2xl p-4 space-y-3 shadow-xl relative overflow-hidden group">
+              <div class="flex justify-between items-start">
+                <div class="flex items-center space-x-3">
+                  <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-[#ff4d6d] to-rose-400 p-0.5">
+                    <div class="w-full h-full rounded-full bg-stone-900 flex items-center justify-center text-[10px] font-extrabold text-white">SA</div>
+                  </div>
+                  <div>
+                    <div class="flex items-center space-x-1.5">
+                      <span class="text-xs font-bold theme-text-light">Sarah</span>
+                      <span class="bg-[#ff4d6d]/10 text-[#ff4d6d] text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase">Block A</span>
+                    </div>
+                    <span class="text-[10px] theme-text-muted font-medium">Post 2 hours ago • Food Recommendation</span>
+                  </div>
+                </div>
+              </div>
+              <p class="text-xs theme-text-light font-bold tracking-wide">The Nasi Lemak uncle is back downstairs! 🍛</p>
+              <p class="text-xs theme-text-muted leading-relaxed">
+                He is back at the basement carpark every morning from 7am-9am. Best in the area, RM5 only. Let's support him!
+              </p>
+              <div class="flex justify-between items-center pt-2 border-t theme-header theme-transition">
+                <div class="flex space-x-4">
+                  <button onclick="triggerLike(this)" class="flex items-center space-x-1.5 text-stone-400 hover:text-[#ff4d6d] transition-colors group relative">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                    <span class="text-xs font-bold count">24</span>
+                  </button>
+                  <button onclick="openCommentDrawer('sarah-post')" class="flex items-center space-x-1.5 text-stone-400 hover:text-[#ff4d6d] transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    <span class="text-xs font-bold">8</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Native Sponsored Ad Post -->
+            <div class="theme-card theme-transition border rounded-2xl p-4 space-y-3 shadow-xl relative overflow-hidden group">
+              <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-yellow-500 via-[#ff4d6d] to-indigo-500"></div>
+              <div class="flex justify-between items-start">
+                <div class="flex items-center space-x-3">
+                  <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-yellow-500 to-amber-300 p-0.5">
+                    <div class="w-full h-full rounded-full bg-stone-900 flex items-center justify-center text-[10px] font-black text-amber-400">CD</div>
+                  </div>
+                  <div>
+                    <div class="flex items-center space-x-1.5">
+                      <span class="text-xs font-bold text-amber-400">CelcomDigi Partner</span>
+                      <span class="bg-amber-500/10 text-amber-300 text-[8px] px-1 rounded font-extrabold uppercase">SPONSORED</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p class="text-xs theme-text-light font-bold tracking-wide">Special High-Speed 5G Plan for Residents! ⚡</p>
+              <p class="text-xs theme-text-muted leading-relaxed">Enjoy lightning fast internet with an exclusive, resident-only premium 5G plan at just <span class="text-[#ff4d6d] font-bold">RM99/month</span>.</p>
+              <button onclick="triggerOfferClaim('CelcomDigi 5G')" class="w-full bg-gradient-to-r from-yellow-500 to-amber-600 text-stone-950 text-xs font-black py-2 rounded-xl transition-all tracking-wider uppercase shadow-md active:scale-95 text-center">
+                Claim Offer
+              </button>
+            </div>
+          </div>
+
+          <!-- Full Screen Immersive Slide Sub-view (Hidden by default) -->
+          <div id="immersive-tiktok-container" class="hidden relative h-[480px] rounded-3xl bg-black overflow-hidden flex flex-col justify-end p-4 border border-[#ff4d6d]/25 shadow-2xl">
+            <div class="absolute inset-0 bg-radial from-transparent to-black/80 z-10 pointer-events-none"></div>
+            <div id="immersive-slide-bg" class="absolute inset-0 transition-all duration-500 z-0 opacity-40 filter blur-sm"></div>
+            
+            <div class="z-20 space-y-4 text-white">
+              <div class="absolute right-3 bottom-20 flex flex-col items-center space-y-5 z-30">
+                <div class="w-10 h-10 rounded-full border-2 border-[#ff4d6d] bg-stone-900 flex items-center justify-center font-bold text-xs">
+                  <span id="slide-author-initials">SA</span>
+                </div>
+                <button onclick="triggerImmersiveLike()" class="flex flex-col items-center group">
+                  <div class="p-2.5 bg-black/40 rounded-full border border-white/10 hover:bg-[#ff4d6d]/20 transition-all text-white hover:text-[#ff4d6d] shadow-lg">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/></svg>
+                  </div>
+                  <span id="slide-likes" class="text-[10px] font-bold mt-1 shadow-sm">24</span>
+                </button>
+                <button onclick="openCommentDrawer('tiktok-mode')" class="flex flex-col items-center">
+                  <div class="p-2.5 bg-black/40 rounded-full border border-white/10 hover:bg-white/10 transition-all text-white shadow-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                  </div>
+                  <span id="slide-comments" class="text-[10px] font-bold mt-1">8</span>
+                </button>
+              </div>
+
+              <div class="space-y-1.5 max-w-[80%] drop-shadow-md">
+                <div class="flex items-center space-x-2">
+                  <span id="slide-author" class="text-xs font-bold text-white">Sarah</span>
+                  <span id="slide-block" class="bg-[#ff4d6d]/80 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded tracking-wide">Block A</span>
+                </div>
+                <h3 id="slide-title" class="text-xs font-black tracking-wide text-white">Basement Carpark Nasi Lemak!</h3>
+                <p id="slide-desc" class="text-[11px] text-stone-200 leading-relaxed font-medium">Sambal is perfect, support our local uncle!</p>
+              </div>
+
+              <div class="flex justify-between items-center pt-2 border-t border-white/10 z-20">
+                <span class="text-[9px] text-stone-400">Discover via swiping</span>
+                <div class="flex space-x-1">
+                  <button onclick="prevTiktokSlide()" class="p-1.5 bg-white/10 hover:bg-white/20 rounded-lg transition-colors">
+                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                  </button>
+                  <button onclick="nextTiktokSlide()" class="p-1.5 bg-white/10 hover:bg-white/20 rounded-lg transition-colors">
+                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUB-TAB B: EVENTS CALENDAR SECTION (Social Infrastructure) -->
+        <div id="social-events-section" class="hidden space-y-4">
+          <div class="theme-card theme-transition border rounded-2xl p-4 flex items-center justify-between">
+            <div class="space-y-1">
+              <span class="text-[9px] text-[#ff4d6d] uppercase tracking-widest font-extrabold">Active Calendar</span>
+              <p class="text-xs font-bold theme-text-light">Want to host an event?</p>
+            </div>
+            <button onclick="showCreateEventToast()" class="bg-[#ff4d6d] hover:bg-[#ff5d7b] text-white text-[10px] font-bold px-3 py-1.5 rounded-xl transition-all">+ Host</button>
+          </div>
+
+          <!-- Events List -->
+          <div class="space-y-3">
+            <!-- Event 1 -->
+            <div class="theme-card theme-transition border rounded-2xl p-4 flex items-start space-x-4">
+              <div class="w-12 theme-date-block theme-transition border rounded-xl py-2 flex flex-col items-center justify-center shrink-0">
+                <span class="text-[9px] font-extrabold uppercase">MAY</span>
+                <span class="text-xl font-black">17</span>
+              </div>
+              <div class="flex-1 space-y-2">
+                <div>
+                  <h3 class="text-xs font-extrabold theme-text-light">Badminton Tournament</h3>
+                  <span class="text-[10px] text-[#9fc759] font-bold">Rooftop Court • 10am - 2pm</span>
+                </div>
+                <p class="text-[11px] theme-text-muted leading-relaxed">Winners get RM50 cash voucher!</p>
+                <div class="flex justify-between items-center pt-2 border-t theme-header theme-transition">
+                  <span class="text-[10px] theme-text-muted font-semibold"><span id="rsvpCount-1" class="theme-text-light font-bold">34</span> going</span>
+                  <button onclick="toggleRSVP(this, 'rsvpCount-1', 34)" class="theme-btn-secondary theme-transition text-[10px] font-extrabold px-3 py-1.5 rounded-xl border">Join</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Event 2 -->
+            <div class="theme-card theme-transition border rounded-2xl p-4 flex items-start space-x-4">
+              <div class="w-12 theme-date-block theme-transition border rounded-xl py-2 flex flex-col items-center justify-center shrink-0">
+                <span class="text-[9px] font-extrabold uppercase">MAY</span>
+                <span class="text-xl font-black">19</span>
+              </div>
+              <div class="flex-1 space-y-2">
+                <div>
+                  <h3 class="text-xs font-extrabold theme-text-light">Community Gardening</h3>
+                  <span class="text-[10px] text-[#9fc759] font-bold">Level 5 Eco-Park • 9am</span>
+                </div>
+                <div class="flex justify-between items-center pt-2 border-t theme-header theme-transition">
+                  <span class="text-[10px] theme-text-muted font-semibold"><span id="rsvpCount-2" class="theme-text-light font-bold">15</span> going</span>
+                  <button onclick="toggleRSVP(this, 'rsvpCount-2', 15)" class="theme-btn-secondary theme-transition text-[10px] font-extrabold px-3 py-1.5 rounded-xl border">RSVP</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ==============================================
+           TAB 4: NOTIFICATION (OFFICIAL MANAGEMENT COMMUNICATON)
+           ============================================== -->
+      <div id="view-notification" class="tab-view hidden py-4 px-4 space-y-4">
+        
+        <div class="flex justify-between items-center">
+          <h2 class="text-sm font-extrabold tracking-wide uppercase theme-text-muted">Notices & Messages</h2>
+          <span class="bg-[#ff4d6d]/10 text-[#ff4d6d] text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-[#ff4d6d]/20">2 unread</span>
+        </div>
+
+        <div class="space-y-3">
+          
+          <!-- Notice Card 1 -->
+          <div class="theme-card theme-transition border rounded-2xl p-4 space-y-3 relative overflow-hidden">
+            <div class="absolute inset-y-0 left-0 w-1 bg-red-500"></div>
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="bg-red-500/10 text-red-400 text-[8px] font-black px-2 py-0.5 rounded-full border border-red-500/20 tracking-wider uppercase">Urgent Notice</span>
+                <h3 class="text-xs font-extrabold theme-text-light mt-1.5">Scheduled Water Interruption</h3>
+              </div>
+            </div>
+            <p class="text-[11px] theme-text-muted leading-relaxed">
+              Syabas scheduled high pressure wash on supply mains. Water supply will be disrupted on <span class="text-red-400 font-bold">June 15th (Thursday) from 9am to 5pm</span>.
+            </p>
+            <div class="pt-2 border-t theme-header theme-transition flex justify-between items-center text-[10px]">
+              <span class="theme-text-muted font-bold">Ref: CV-WTR-2026</span>
+              <button onclick="simulateAcknowledge('Syabas water interruption')" class="theme-btn-action theme-transition border px-3 py-1 rounded-lg font-bold">Acknowledge</button>
+            </div>
+          </div>
+
+          <!-- Notice Card 2 -->
+          <div class="theme-card theme-transition border rounded-2xl p-4 space-y-3 relative overflow-hidden">
+            <div class="absolute inset-y-0 left-0 w-1 bg-[#ff4d6d]"></div>
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="bg-[#ff4d6d]/10 text-[#ff4d6d] text-[8px] font-black px-2 py-0.5 rounded-full border border-[#ff4d6d]/20 tracking-wider uppercase">Security Update</span>
+                <h3 class="text-xs font-extrabold theme-text-light mt-1.5">New Visitor QR Process</h3>
+              </div>
+            </div>
+            <p class="text-[11px] theme-text-muted leading-relaxed">
+              Beginning next week, all visitors must register via the guard gate QR codes to bypass visitor lanes.
+            </p>
+            <div class="pt-2 border-t theme-header theme-transition flex justify-between items-center text-[10px]">
+              <span class="theme-text-muted font-bold">Ref: CV-SEC-2026</span>
+              <button onclick="simulateAcknowledge('QR visitor passes')" class="theme-btn-action theme-transition border px-3 py-1 rounded-lg font-bold">View Guide</button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ==============================================
+           TAB 5: PROFILE (USER SETTINGS + PREMIUM JETPACK)
+           ============================================== -->
+      <div id="view-profile" class="tab-view hidden py-4 px-4 space-y-6">
+        
+        <!-- Premium Visual Header with Glowing Plus Motif -->
+        <div class="text-center space-y-4 relative">
+          <div class="absolute left-1/2 -translate-x-1/2 top-4 w-32 h-32 bg-radial from-[#ff4d6d]/30 to-transparent blur-2xl z-0 pointer-events-none"></div>
+          
+          <div class="relative z-10 flex justify-center">
+            <div class="relative w-20 h-20 bg-stone-950 rounded-3xl flex items-center justify-center border-2 border-[#ff4d6d] shadow-lg">
+              <span class="text-3xl font-extrabold text-white">JaGa</span>
+              <span class="absolute -top-2 -right-2 text-3xl font-black text-[#ff4d6d] drop-shadow-[0_0_10px_#ff4d6d] animate-pulse">+</span>
+            </div>
+          </div>
+
+          <div class="space-y-1 relative z-10">
+            <h2 class="text-lg font-extrabold tracking-wide theme-text-light">Introducing JaGaPlus<span class="text-[#ff4d6d] font-black">+</span></h2>
+            <p class="theme-text-muted text-xs px-6 leading-relaxed">
+              At a price of a loaf of bread, join us on a money-saving journey where you can discover exclusive A Plus rewards everyday.
+            </p>
+          </div>
+        </div>
+
+        <!-- Plus a Gift Every Month Badge -->
+        <div class="theme-gift-badge theme-transition border rounded-2xl p-4 flex items-center space-x-4">
+          <div class="w-10 h-10 rounded-full bg-[#ff4d6d] flex items-center justify-center shadow-lg shrink-0">
+            <svg class="w-5 h-5 text-white animate-pulse" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/></svg>
+          </div>
+          <div>
+            <h4 class="text-xs font-bold theme-text-light">Plus a Gift Every Month</h4>
+            <p class="text-[10px] theme-text-muted">Unlock free coffees, pastries, and locksmith discount tokens.</p>
+          </div>
+        </div>
+
+        <!-- FAQ Section with Collapsible Accordions -->
+        <div class="space-y-3">
+          <h3 class="theme-text-muted text-xs font-extrabold uppercase tracking-widest">Frequently asked questions</h3>
+          
+          <!-- FAQ 1 -->
+          <div class="border-b theme-header theme-transition">
+            <button onclick="toggleAccordion('faq1')" class="w-full flex justify-between items-center py-3 text-left focus:outline-none">
+              <span class="text-xs font-bold theme-text-light font-semibold">What is JaGaPlus</span>
+              <svg id="faq1-icon" class="w-4 h-4 text-[#ff4d6d] transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div id="faq1-body" class="hidden pb-3 text-[11px] theme-text-muted leading-relaxed">
+              JaGaPlus is our premium resident pass that unlocks massive, exclusive local merchant discounts, first-row booking for facilities, and specialized verified home emergency callouts.
+            </div>
+          </div>
+
+          <!-- FAQ 2 -->
+          <div class="border-b theme-header theme-transition">
+            <button onclick="toggleAccordion('faq2')" class="w-full flex justify-between items-center py-3 text-left focus:outline-none">
+              <span class="text-xs font-bold theme-text-light font-semibold">Why do I have to pay</span>
+              <svg id="faq2-icon" class="w-4 h-4 text-[#ff4d6d] transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div id="faq2-body" class="hidden pb-3 text-[11px] theme-text-muted leading-relaxed">
+              Your subscription directly funds neighborhood maintenance initiatives, verified business background checks, and pays for the physical event resources that organize resident nites.
+            </div>
+          </div>
+
+          <!-- FAQ 3 -->
+          <div class="border-b theme-header theme-transition">
+            <button onclick="toggleAccordion('faq3')" class="w-full flex justify-between items-center py-3 text-left focus:outline-none">
+              <span class="text-xs font-bold theme-text-light font-semibold">Can I cancel anytime</span>
+              <svg id="faq3-icon" class="w-4 h-4 text-[#ff4d6d] transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div id="faq3-body" class="hidden pb-3 text-[11px] theme-text-muted leading-relaxed">
+              Absolutely. There are no locking contracts or early termination fees. Cancel easily with a single click inside your Profile Settings.
+            </div>
+          </div>
+        </div>
+
+        <button onclick="simulateSubscription()" class="w-full bg-[#ff4d6d] text-white hover:bg-[#ff5d7b] transition-all text-xs font-extrabold py-3.5 px-6 rounded-full text-center brand-glow active:scale-95">
+          Be a Fan at just RM4.90/month
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- ==============================================
+         NEW: SMART guided BOOKING ONBOARDING WIZARD DRAWER (Duolingo Style)
+         ============================================== -->
+    <div id="bookingWizardDrawer" class="hidden absolute inset-0 theme-frame z-50 flex flex-col animate-fade-in theme-transition">
+      
+      <!-- Progress Bar Header -->
+      <div class="px-5 py-4 border-b theme-header theme-transition flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <button onclick="prevWizardStep()" id="wizardBackBtn" class="text-stone-300 hover:text-white bg-[#1a1d13] p-2.5 rounded-xl border border-dashed border-[#ff4d6d]/40">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          <div>
+            <h3 id="wizardHeaderTitle" class="text-xs font-black theme-text-light">Booking Wizard</h3>
+            <span id="wizardStepIndicator" class="text-[9px] text-[#ff4d6d] font-bold">Step 1 of 7</span>
+          </div>
+        </div>
+        <button onclick="closeWizard()" class="text-stone-400 hover:text-white p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Linear Duolingo Indicator Bar -->
+      <div class="w-full h-1.5 theme-progress-track theme-transition relative">
+        <div id="wizardProgressBar" class="h-full bg-[#ff4d6d] transition-all duration-300" style="width: 14%"></div>
+      </div>
+
+      <!-- Step Content Area -->
+      <div class="flex-1 overflow-y-auto">
+        
+        <!-- STEP 1: SERVICE TYPE / CATEGORY SELECT -->
+        <div id="wizard-step-1" class="wizard-step-content p-5 space-y-4">
+          <h2 id="wizardStep1Title" class="text-sm font-extrabold theme-text-light mb-1">What can we help you with?</h2>
+          <p id="wizardStep1Sub" class="text-[11px] theme-text-muted leading-relaxed">Choose your service type. We will compile custom quotation rates instantly.</p>
+          <div id="step1CardsContainer" class="space-y-2.5">
+            <!-- Injected dynamically in JS -->
+          </div>
+        </div>
+
+        <!-- STEP 2: QUANTITY SELECTOR (For aircon/locksmith) OR PHOTO UPLOAD (For plumbing) -->
+        <div id="wizard-step-2" class="wizard-step-content p-5 space-y-4 hidden">
+          
+          <!-- Dynamic Aircon Qty layout -->
+          <div id="wizard-qty-view" class="space-y-4">
+            <h2 id="wizardStep2Title" class="text-sm font-extrabold theme-text-light mb-1">How many need servicing?</h2>
+            <p id="wizardStep2Sub" class="text-[11px] theme-text-muted">Specify the amount. Multi-unit discount applies automatically.</p>
+            
+            <div class="flex flex-col items-center justify-center space-y-4 py-8">
+              <div class="flex items-center space-x-6">
+                <button onclick="adjustQuantity(-1)" class="w-12 h-12 rounded-full border theme-card-secondary theme-transition text-xl font-bold flex items-center justify-center hover:bg-[#ff4d6d]/10 hover:border-[#ff4d6d] transition-all">-</button>
+                <span id="wizardQuantityVal" class="text-4xl font-extrabold theme-text-light">1</span>
+                <button onclick="adjustQuantity(1)" class="w-12 h-12 rounded-full border theme-card-secondary theme-transition text-xl font-bold flex items-center justify-center hover:bg-[#ff4d6d]/10 hover:border-[#ff4d6d] transition-all">+</button>
+              </div>
+              
+              <div class="theme-card-secondary border p-3.5 rounded-xl text-center w-full max-w-[240px]">
+                <span class="text-[9px] theme-text-muted font-bold block uppercase tracking-wider font-semibold">Estimated Running Total</span>
+                <span id="runningTotalVal" class="text-lg font-black text-[#ff4d6d]">RM 200.00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Plumbing Photo Upload layout (SPEEDS UP FLOW) -->
+          <div id="wizard-photo-view" class="space-y-4 hidden">
+            <h2 class="text-sm font-extrabold theme-text-light mb-1">Snap or Upload a Photo of your Issue 📸</h2>
+            <p class="text-[11px] theme-text-muted leading-relaxed">Skip human concierge wait times. Our AI scan instantly analyzes the issue to estimate cost and notify the vendor immediately.</p>
+            
+            <div onclick="simulatePlumbingPhotoUpload()" id="photoUploadZone" class="border-2 border-dashed border-[#ff4d6d]/30 hover:border-[#ff4d6d] rounded-2xl p-8 text-center cursor-pointer transition-colors flex flex-col items-center justify-center space-y-2 relative overflow-hidden bg-[#ff4d6d]/5 h-44 animate-pulse">
+              <div id="scanLaser" class="absolute left-0 right-0 h-1 bg-[#ff4d6d] opacity-0 scanner-line"></div>
+              
+              <svg class="w-10 h-10 text-[#ff4d6d]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <p id="uploadPromptText" class="text-xs font-black theme-text-light">Tap to simulate Snapping Photo</p>
+              <p id="uploadPromptSub" class="text-[10px] theme-text-muted">Take a picture of the leaking joint or clogged drain</p>
+            </div>
+            <div id="scanFeedbackBlock" class="hidden text-center text-xs py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 font-bold">
+              Scan Finished! Proceed to continue quotation diagnosis.
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: MOUNTING / STYLE (Aircon) OR AI DIAGNOSIS SCAN RESULTS (Plumbing) -->
+        <div id="wizard-step-3" class="wizard-step-content p-5 space-y-4 hidden">
+          
+          <div id="wizard-style-view" class="space-y-4">
+            <h2 id="wizardStep3Title" class="text-sm font-extrabold theme-text-light mb-1">Select style / location</h2>
+            <p id="wizardStep3Sub" class="text-[11px] theme-text-muted">Choose options so we deploy appropriate tools & technicians.</p>
+            <div id="step3CardsContainer" class="space-y-2.5">
+              <!-- Injected dynamically in JS -->
+            </div>
+          </div>
+
+          <div id="wizard-plumbing-ai-view" class="space-y-4 hidden">
+            <h2 class="text-sm font-extrabold theme-text-light mb-1">Instant AI Scan Diagnosis Results 🤖</h2>
+            <p class="text-[11px] theme-text-muted">Analysis finished in 1.4 seconds with 94% accuracy confidence.</p>
+            
+            <div class="theme-card border p-4 rounded-2xl space-y-3.5 shadow-sm">
+              <div class="flex items-center space-x-3">
+                <div class="p-2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-xl font-bold select-none text-xl">💧</div>
+                <div>
+                  <h4 class="text-xs font-black theme-text-light">Sink drainage connector leak detected</h4>
+                  <p class="text-[10px] text-emerald-400 font-bold">Joint Seal Fracture Case</p>
+                </div>
+              </div>
+              <p class="text-[11px] theme-text-muted leading-relaxed">Typical repair involves fitting a new connector gasket and applying silicon solder joints.</p>
+              
+              <div class="bg-amber-500/5 border border-amber-500/20 p-3 rounded-xl space-y-1.5 text-xs theme-transition">
+                <div class="flex justify-between theme-text-muted">
+                  <span>Rough Local Repair Estimate</span>
+                  <span class="font-extrabold theme-text-light">RM 90.00 - RM 140.00</span>
+                </div>
+                <div class="flex justify-between border-t border-dashed theme-header pt-1.5 font-bold">
+                  <span class="theme-text-light">Inspection Callout Fee</span>
+                  <span class="text-[#ff4d6d]">RM 50.00 (Non-Refundable)</span>
+                </div>
+              </div>
+              <p class="text-[10px] theme-text-muted text-center leading-relaxed">
+                The RM50 booking fee securely locks Pak Abu on-site and covers transport & labor. This fee is non-refundable but is fully offset from your final repair invoice!
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- STEP 4: TREATMENT GRADE -->
+        <div id="wizard-step-4" class="wizard-step-content p-5 space-y-4 hidden">
+          <h2 id="wizardStep4Title" class="text-sm font-extrabold theme-text-light mb-1">Choose cleaning standard</h2>
+          <p id="wizardStep4Sub" class="text-[11px] theme-text-muted">Normal treatment clears basic filters. Chemical sanitization flushes mold.</p>
+          <div id="step4CardsContainer" class="grid grid-cols-2 gap-3.5">
+            <!-- Injected dynamically in JS -->
+          </div>
+        </div>
+
+        <!-- STEP 5: INSTANT QUOTATION SUMMARY -->
+        <div id="wizard-step-5" class="wizard-step-content p-5 space-y-4 hidden">
+          <h2 class="text-sm font-extrabold theme-text-light mb-1">Your Booking Summary (Quotation)</h2>
+          <p class="text-[11px] theme-text-muted">Everything is compiled beautifully. Review rates before choosing slot.</p>
+          
+          <div class="theme-card theme-transition border p-4 rounded-2xl space-y-3 shadow-md">
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between">
+                <span class="theme-text-muted">Service Selection</span>
+                <span id="summaryServiceText" class="font-extrabold theme-text-light">Aircon Cleaning</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="theme-text-muted">Quantity / Copies</span>
+                <span id="summaryQtyText" class="font-bold theme-text-light">1 Unit</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="theme-text-muted">System Mounting Style</span>
+                <span id="summaryUnitTypeText" class="font-bold theme-text-light">Wall Mounted</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="theme-text-muted">Treatment Selection</span>
+                <span id="summaryMethodText" class="font-bold theme-text-light">Chemical Sanitizing</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="theme-text-muted">Unit Rate</span>
+                <span id="summaryUnitPriceText" class="font-bold theme-text-light">RM 200.00</span>
+              </div>
+              <div class="flex justify-between border-t border-dashed theme-header pt-2.5">
+                <span class="theme-text-muted">Resident Address</span>
+                <span class="font-extrabold theme-text-light text-[10px]">Changkat View, Block B, 08</span>
+              </div>
+            </div>
+
+            <!-- SST Breakdown (As seen in image_4f431e.png) -->
+            <div class="theme-sst-box theme-transition border p-3 rounded-xl space-y-1.5 text-xs">
+              <div class="flex justify-between theme-text-muted">
+                <span>Total (before SST)</span>
+                <span id="summarySubtotalText">RM 200.00</span>
+              </div>
+              <div class="flex justify-between theme-text-muted">
+                <span>Service Tax (SST @ 8%)</span>
+                <span id="summarySstText">RM 16.00</span>
+              </div>
+              <div class="flex justify-between border-t border-dashed theme-header pt-1.5 font-black text-xs">
+                <span class="theme-text-light">Grand Total (with SST)</span>
+                <span id="summaryGrandTotalText" class="text-[#ff4d6d]">RM 216.00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 6: DATE & TIME SELECTOR -->
+        <div id="wizard-step-6" class="wizard-step-content p-5 space-y-4 hidden">
+          <h2 class="text-sm font-extrabold theme-text-light mb-1">Pick your preferred schedule</h2>
+          <p class="text-[11px] theme-text-muted">Secure active slots immediately. Our verified local partners are locked for these timings.</p>
+          
+          <div class="space-y-4">
+            <div>
+              <span class="text-[9px] theme-text-muted font-black uppercase tracking-widest block mb-2">Available Dates</span>
+              <div class="grid grid-cols-3 gap-2">
+                <div onclick="selectWizardDate('18 May (Mon)', this)" class="wizard-date-card theme-card border p-3 rounded-xl text-center cursor-pointer hover:border-[#ff4d6d] transition-all">
+                  <span class="block text-[10px] font-bold">18 May</span>
+                  <span class="block text-[8px] theme-text-muted">Monday</span>
+                </div>
+                <div onclick="selectWizardDate('19 May (Tue)', this)" class="wizard-date-card theme-card border p-3 rounded-xl text-center cursor-pointer hover:border-[#ff4d6d] transition-all">
+                  <span class="block text-[10px] font-bold">19 May</span>
+                  <span class="block text-[8px] theme-text-muted">Tuesday</span>
+                </div>
+                <div onclick="selectWizardDate('23 May (Sat)', this)" class="wizard-date-card theme-card border p-3 rounded-xl text-center cursor-pointer hover:border-[#ff4d6d] transition-all">
+                  <span class="block text-[10px] font-bold">23 May</span>
+                  <span class="block text-[8px] theme-text-muted">Saturday</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <span class="text-[9px] theme-text-muted font-black uppercase tracking-widest block mb-2">Available Timings</span>
+              <div class="grid grid-cols-3 gap-2">
+                <button onclick="selectWizardTime('10:00 AM', this)" class="wizard-time-btn theme-card border py-2 rounded-xl text-[10px] font-extrabold hover:border-[#ff4d6d] transition-all">10:00 AM</button>
+                <button onclick="selectWizardTime('01:00 PM', this)" class="wizard-time-btn theme-card border py-2 rounded-xl text-[10px] font-extrabold hover:border-[#ff4d6d] transition-all">01:00 PM</button>
+                <button onclick="selectWizardTime('03:30 PM', this)" class="wizard-time-btn theme-card border py-2 rounded-xl text-[10px] font-extrabold hover:border-[#ff4d6d] transition-all">03:30 PM</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 7: SECURE CHECKOUT (Fiuu Gateway) -->
+        <div id="wizard-step-7" class="wizard-step-content p-5 space-y-4 hidden flex flex-col justify-between h-[360px]">
+          <div class="space-y-3.5 text-center">
+            <div class="inline-flex p-3 bg-emerald-500/10 rounded-full text-emerald-400 border border-emerald-500/20 mb-1">
+              <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0110.5 21a3.745 3.745 0 01-3.296-1.593 3.745 3.745 0 01-3.296-1.043 3.745 3.745 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.745 3.745 0 013.296-1.043A3.745 3.745 0 0113.5 3c1.268 0 2.39.63 3.068 1.593a3.746 3.745 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z"/></svg>
+            </div>
+            <h2 class="text-sm font-extrabold theme-text-light">PCI-DSS Secure Lock</h2>
+            <p id="checkoutPolicyText" class="text-[11px] theme-text-muted leading-relaxed">Your payment will directly lock your slot in the calendar and dispatch service kits instantly.</p>
+            
+            <div class="theme-card-secondary border p-4 rounded-xl max-w-[280px] mx-auto space-y-1">
+              <span id="wizardPaymentTitleText" class="text-[8px] theme-text-muted font-bold block uppercase tracking-wider">Checkout Total</span>
+              <span id="wizardPaymentAmountText" class="text-2xl font-black text-[#ff4d6d]">RM 216.00</span>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <button onclick="wizardProcessPayment()" class="w-full bg-[#ff4d6d] hover:bg-[#ff5d7b] text-white text-xs font-black py-3 px-6 rounded-xl transition-all brand-glow uppercase tracking-wide">
+              Pay Securely Now
+            </button>
+            <div class="flex items-center justify-center space-x-1.5 text-[9px] theme-text-muted font-bold">
+              <span>Powered by <strong class="text-sky-500">Fiuu</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 8: SUCCESS & UNLOCKED COORDINATION CHAT -->
+        <div id="wizard-step-8" class="wizard-step-content p-5 space-y-5 hidden text-center flex flex-col justify-center items-center py-8">
+          <div class="w-16 h-14 rounded-full bg-emerald-500/20 border border-emerald-500 flex items-center justify-center text-emerald-400 mb-2 animate-bounce">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+          </div>
+          <div class="space-y-1.5">
+            <h2 class="text-base font-extrabold text-emerald-400">Booking Secured & Paid!</h2>
+            <p id="wizardSuccessDetails" class="text-[11px] theme-text-muted px-4 leading-relaxed">Receipt HJG-260515-00003 is processed. Aircon Clean for Monday, 18 May at 10:00 AM is registered.</p>
+          </div>
+
+          <div class="theme-card-secondary border p-4 rounded-xl text-left w-full space-y-2">
+            <span class="bg-[#ff4d6d]/10 text-[#ff4d6d] text-[8px] font-black px-2 py-0.5 rounded uppercase block w-max">AI CONCIERGE UNLOCKED</span>
+            <p class="text-[11px] theme-text-light font-bold">Want to schedule custom instructions?</p>
+            <p class="text-[10px] theme-text-muted">Aija, our resident assistant, is ready. Coordination regarding elevator permit applications, key locations, or parking clearance can be chatted right now.</p>
+          </div>
+
+          <button onclick="finishWizardAndOpenChat()" class="w-full bg-[#ff4d6d] hover:bg-[#ff5d7b] text-white text-xs font-black py-3.5 rounded-xl transition-all brand-glow tracking-wider uppercase">
+            Open Coordination Chat
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Duolingo-style wizard navigation footer -->
+      <div id="wizardFooter" class="p-4 theme-header theme-transition border-t flex justify-between items-center z-30">
+        <span class="text-[10px] theme-text-muted">Select an option to proceed</span>
+        <button onclick="nextWizardStep()" id="wizardNextBtn" class="bg-[#ff4d6d] hover:bg-[#ff5d7b] text-white text-xs font-black px-5 py-3 rounded-xl transition-all tracking-wider uppercase active:scale-95 shadow-md flex items-center gap-1.5">
+          <span>Continue</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ==============================================
+         AUTHENTIC CLONED NAVIGATION BAR (FROM ATTACHED IMAGE)
+         ============================================== -->
+    <div class="relative bg-white pt-2.5 pb-6 border-t border-stone-200 z-30 shadow-[0_-5px_15px_rgba(0,0,0,0.06)] px-4 flex justify-between items-center select-none text-stone-500">
+      
+      <!-- Tab 1: Home -->
+      <button onclick="switchTab('home')" id="nav-home" class="flex-1 flex flex-col items-center space-y-1 text-stone-800 transition-colors">
+        <div class="p-1 px-3 rounded-full bg-red-100 text-stone-900 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+          </svg>
+        </div>
+        <span class="text-[9px] font-bold">Home</span>
+      </button>
+
+      <!-- Tab 2: Market/Nearby -->
+      <button onclick="switchTab('market')" id="nav-market" class="flex-1 flex flex-col items-center space-y-1 transition-colors">
+        <div class="p-1 px-3 rounded-full transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+          </svg>
+        </div>
+        <span class="text-[9px] font-bold">Market</span>
+      </button>
+
+      <!-- Central Floating Master G/House Logo Button (Authentic replication) -->
+      <div class="relative flex justify-center items-center w-14 h-14 -mt-7 z-40 shrink-0">
+        <button onclick="triggerCentralButton()" id="nav-central" class="w-14 h-14 rounded-full bg-[#ff4d6d] hover:bg-[#ff5d7b] shadow-[0_4px_12px_rgba(255,77,109,0.4)] flex items-center justify-center transition-transform active:scale-90 border-4 border-white">
+          <svg class="w-7.5 h-7.5 text-white" fill="none" stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Tab 3: Notification -->
+      <button onclick="switchTab('notification')" id="nav-notification" class="flex-1 flex flex-col items-center space-y-1 transition-colors">
+        <div class="p-1 px-3 rounded-full transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+          </svg>
+        </div>
+        <span class="text-[9px] font-bold">Notification</span>
+      </button>
+
+      <!-- Tab 4: Profile -->
+      <button onclick="switchTab('profile')" id="nav-profile" class="flex-1 flex flex-col items-center space-y-1 transition-colors">
+        <div class="p-1 px-3 rounded-full transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+        </div>
+        <span class="text-[9px] font-bold">Profile</span>
+      </button>
+
+    </div>
+
+    <!-- ==============================================
+         REAL-TIME SERVICE BOOKING CHAT DRAWER
+         ============================================== -->
+    <div id="bookingChatDrawer" class="hidden absolute inset-0 theme-frame z-50 flex flex-col animate-fade-in theme-transition">
+      <div class="px-5 py-3 border-b theme-header theme-transition flex items-center justify-between shadow-md">
+        <div class="flex items-center space-x-3">
+          <button onclick="closeBookingChat()" class="text-stone-300 hover:text-white bg-stone-900 p-2 rounded-xl">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          <div>
+            <h3 id="chatVendorName" class="text-xs font-black theme-text-light">Pak Din Locksmith</h3>
+            <span class="text-[9px] text-[#9fc759] font-bold">● Replies in 5 minutes</span>
+          </div>
+        </div>
+        <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2.5 py-0.5 rounded font-extrabold uppercase">Verified</span>
+      </div>
+
+      <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-3.5 text-xs">
+        <div class="flex space-x-2">
+          <div class="w-8 h-8 rounded-xl bg-[#ff4d6d]/10 flex items-center justify-center shrink-0 border border-[#ff4d6d]/25">
+            <span class="text-[10px] font-bold text-[#ff4d6d]">VS</span>
+          </div>
+          <div class="theme-card theme-transition border p-3 rounded-2xl rounded-tl-none theme-text-light leading-relaxed max-w-[80%]">
+            Hello Changkat View resident! Let me know your unit block and details of the service requested. I can provide an instant quote right here.
+          </div>
+        </div>
+      </div>
+
+      <div class="px-4 py-2 theme-header theme-transition border-t flex space-x-1.5 overflow-x-auto no-scrollbar">
+        <button onclick="sendQuickChatMessage('I need immediate service today!')" class="theme-card-secondary theme-transition theme-text-light px-3 py-1 rounded-full text-[10px] font-bold whitespace-nowrap">⚡ Immediate Service</button>
+        <button onclick="sendQuickChatMessage('What is your pricing?')" class="theme-card-secondary theme-transition theme-text-light px-3 py-1 rounded-full text-[10px] font-bold whitespace-nowrap">💰 Check Pricing</button>
+      </div>
+
+      <div class="p-3 border-t theme-header theme-transition flex items-center space-x-2.5">
+        <input id="chatInput" type="text" placeholder="Type a response..." class="flex-1 theme-input theme-transition border rounded-xl px-3.5 py-2.5 text-xs placeholder-stone-500 focus:outline-none focus:ring-1 focus:ring-[#ff4d6d]">
+        <button onclick="handleSendButton()" class="bg-[#ff4d6d] hover:bg-[#ff5d7b] text-white p-2.5 rounded-xl transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ==============================================
+         INTERACTIVE COMMENT DRAWER
+         ============================================== -->
+    <div id="commentDrawer" class="hidden absolute inset-0 theme-frame theme-modal-bg z-50 flex flex-col animate-fade-in theme-transition">
+      <div class="px-5 py-4 border-b theme-header theme-transition flex items-center justify-between">
+        <h3 class="text-xs font-bold theme-text-light">Comments</h3>
+        <button onclick="closeCommentDrawer()" class="theme-text-muted hover:text-white p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="commentList" class="flex-1 overflow-y-auto p-4 space-y-4 text-xs"></div>
+      <div class="p-3 theme-header theme-transition border-t flex space-x-2.5">
+        <input id="newCommentInput" type="text" placeholder="Add a comment..." class="flex-1 theme-input theme-transition border rounded-xl px-3.5 py-2.5 text-xs placeholder-stone-500 focus:outline-none">
+        <button onclick="addComment()" class="bg-[#ff4d6d] hover:bg-[#ff5d7b] text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all">Post</button>
+      </div>
+    </div>
+
+    <!-- DYNAMIC APP TOASTS -->
+    <div id="toastMessage" class="hidden absolute top-16 left-1/2 transform -translate-x-1/2 bg-[#ff4d6d] text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl z-50 flex items-center space-x-2 border border-white/20 select-none">
+      <span id="toastText">Action successful!</span>
+    </div>
+
+  </div>
+
+  <script>
+    // Duolingo style Preference compilation data based on service category
+    const wizardCategoryData = {
+      aircon: {
+        title: "Aircon Servicing Booking",
+        totalSteps: 7,
+        step1: {
+          title: "What can we help you with today? ❄️",
+          sub: "Choose your primary service type. We will build a live, transparent quotation instantly.",
+          options: [
+            { id: 'cleaning', title: 'Aircon Cleaning & Wash', desc: 'Dust filter clearance, deep sanitizing, & drainage flush.', icon: '🧪', priceText: 'From RM100/unit' },
+            { id: 'installation', title: 'Professional Installation', desc: 'Technician mounting, copper piping & compressor placement.', icon: '🔧', priceText: 'From RM250/unit' },
+            { id: 'troubleshooting', title: 'Troubleshooting & Leaks', desc: 'Diagnostics for bad cooling, water leakage, or strange sounds.', icon: '⚠️', priceText: 'From RM80/unit' }
+          ]
+        },
+        step3: {
+          title: "Specify your aircon unit type",
+          sub: "Choose the correct mounting style so our technicians deploy accurate service kits.",
+          options: [
+            { id: 'wallmounted', title: 'Wall Mounted Unit', desc: 'Standard residential split wall unit.', icon: '📺', addon: 0 },
+            { id: 'cassette', title: 'Ceiling Cassette Unit', desc: '4-way ceiling recessed heavy cooling system.', icon: '🔲', addon: 50 },
+            { id: 'ducted', title: 'Ducted Cooling Grill', desc: 'Centralized ceiling duct grills.', icon: '🌀', addon: 80 }
+          ]
+        },
+        step4: {
+          title: "Choose cleaning treatment standard",
+          sub: "Standard treatment wipes the covers. Chemical sanitizing eliminates bad odors and mold completely.",
+          options: [
+            { id: 'normal', title: 'Normal Cleaning', desc: 'Basic filter clearing and surface chemical wipe.', icon: '🪥', price: 100 },
+            { id: 'chemical', title: 'Chemical Deep Sanitizing', desc: 'Mold sterilizer treatment. Highly recommended.', icon: '🧪', price: 200 }
+          ]
+        }
+      },
+      locksmith: {
+        title: "Locksmith Emergency Booking",
+        totalSteps: 7,
+        step1: {
+          title: "What locksmith service do you need? 🔓",
+          sub: "Choose the service category. Fast emergency dispatch is active for Changkat View.",
+          options: [
+            { id: 'unlock', title: 'Lockout Assist', desc: 'Locked out of unit or bedroom room doors.', icon: '🔓', priceText: 'From RM120/door' },
+            { id: 'duplicate', title: 'Key Duplication / Spares', desc: 'Make durable extra duplicate key copies.', icon: '🔑', priceText: 'From RM20/key' }
+          ]
+        },
+        step3: {
+          title: "Select lock location style",
+          sub: "Choose the lock style so technicians bring appropriate cylinder picking templates.",
+          options: [
+            { id: 'maindoor', title: 'Main Entrance Grill Door', desc: 'Standard heavy-security steel grills.', icon: '🚪', addon: 30 },
+            { id: 'roomdoor', title: 'Bedroom Cylinder Door', desc: 'Bedroom standard handle locks.', icon: '🚪', addon: 0 },
+            { id: 'digital', title: 'High-Security Digital lock', desc: 'Electronic keypad or biometric locks.', icon: '🔢', addon: 100 }
+          ]
+        },
+        step4: {
+          title: "Choose duplicated quality grade",
+          sub: "Select normal duplicates or premium high-security laser-cut spare keys.",
+          options: [
+            { id: 'normal', title: 'Standard duplicates', desc: 'Standard brass copy with standard durability.', icon: '🔑', price: 20 },
+            { id: 'premium', title: 'Laser-Cut High Security', desc: 'Precision laser cut key duplicating.', icon: '💎', price: 45 }
+          ]
+        }
+      },
+      plumbing: {
+        title: "Plumbing Emergency Scan Lock",
+        totalSteps: 5, // Shorter optimized flow for instant turnaround
+        step1: {
+          title: "What plumbing issue are you facing? 💧",
+          sub: "Select a category below. You'll upload a photo next for instant AI price scanning.",
+          options: [
+            { id: 'pipe_leak', title: 'Leaking Pipe or Joint', desc: 'Uncontrolled dripping under the sink, ceiling, or behind walls.', icon: '💧', priceText: 'AI Scan Active' },
+            { id: 'drain_clog', title: 'Clogged Toilet or Sink', desc: 'Water backed up or draining extremely slowly.', icon: '🚽', priceText: 'AI Scan Active' },
+            { id: 'low_pressure', title: 'Low Water Pressure', desc: 'Dribbling water flow in showers or taps.', icon: '📈', priceText: 'AI Scan Active' }
+          ]
+        }
+      }
+    };
+
+    // Global Wizard State
+    let currentBookingStep = 1;
+    let totalBookingSteps = 7;
+    let bookingState = {
+      vendor: 'Ah Beng Aircon Pak',
+      category: 'aircon', // aircon vs locksmith vs plumbing
+      serviceType: 'cleaning',
+      quantity: 1,
+      unitType: 'wallmounted',
+      method: 'chemical',
+      selectedDate: '',
+      selectedTime: '',
+      photoUploaded: false,
+      paid: false
+    };
+
+    // Wizard Entrance
+    function openBookingWizard(vendorName) {
+      bookingState.vendor = vendorName;
+      
+      // Dynamic route map
+      if (vendorName.toLowerCase().includes('plumbing')) {
+        bookingState.category = 'plumbing';
+        bookingState.serviceType = 'pipe_leak';
+        totalBookingSteps = wizardCategoryData.plumbing.totalSteps;
+        bookingState.photoUploaded = false;
+        
+        // Hide standard inputs, show photo/AI blocks
+        document.getElementById('wizard-qty-view').classList.add('hidden');
+        document.getElementById('wizard-photo-view').classList.remove('hidden');
+        document.getElementById('wizard-style-view').classList.add('hidden');
+        document.getElementById('wizard-plumbing-ai-view').classList.remove('hidden');
+        
+        // Update payment gateway text
+        document.getElementById('checkoutPolicyText').innerText = "Typical inspection fee covers labor & transport. This RM50 slot lock booking fee is non-refundable but is fully offset from your final repair invoice.";
+      } else {
+        // Reset to standard aircon/locksmith structures
+        if (vendorName.toLowerCase().includes('locksmith')) {
+          bookingState.category = 'locksmith';
+          bookingState.serviceType = 'unlock';
+          bookingState.unitType = 'maindoor';
+          bookingState.method = 'normal';
+        } else {
+          bookingState.category = 'aircon';
+          bookingState.serviceType = 'cleaning';
+          bookingState.unitType = 'wallmounted';
+          bookingState.method = 'chemical';
+        }
+        totalBookingSteps = 7;
+        
+        document.getElementById('wizard-qty-view').classList.remove('hidden');
+        document.getElementById('wizard-photo-view').classList.add('hidden');
+        document.getElementById('wizard-style-view').classList.remove('hidden');
+        document.getElementById('wizard-plumbing-ai-view').classList.add('hidden');
+        
+        document.getElementById('checkoutPolicyText').innerText = "Your payment securely locks your slot in the calendar and dispatches service kits instantly.";
+      }
+      
+      bookingState.quantity = 1;
+      bookingState.selectedDate = '';
+      bookingState.selectedTime = '';
+      bookingState.paid = false;
+      currentBookingStep = 1;
+      
+      // Reset simulated scan laser visual elements
+      const laser = document.getElementById('scanLaser');
+      laser.classList.add('opacity-0');
+      document.getElementById('uploadPromptText').innerText = "Tap to simulate Snapping Photo";
+      document.getElementById('scanFeedbackBlock').classList.add('hidden');
+
+      renderWizardStep1();
+      renderWizardStep3();
+      renderWizardStep4();
+      updateWizardUI();
+
+      // Show wizard drawer
+      document.getElementById('bookingWizardDrawer').classList.remove('hidden');
+    }
+
+    function closeWizard() {
+      document.getElementById('bookingWizardDrawer').classList.add('hidden');
+    }
+
+    // Dynamic Wizard Renderers
+    function renderWizardStep1() {
+      const cat = bookingState.category;
+      const data = wizardCategoryData[cat].step1;
+      document.getElementById('wizardStep1Title').innerText = data.title;
+      document.getElementById('wizardStep1Sub').innerText = data.sub;
+
+      const container = document.getElementById('step1CardsContainer');
+      container.innerHTML = '';
+      data.options.forEach(opt => {
+        const isSelected = bookingState.serviceType === opt.id;
+        const card = document.createElement('div');
+        card.id = `step1-opt-${opt.id}`;
+        card.className = `theme-card theme-transition border p-3.5 rounded-2xl cursor-pointer flex items-center space-x-3.5 hover:scale-[1.01] ${isSelected ? 'wizard-card-selected' : ''}`;
+        card.onclick = () => selectServiceType(opt.id);
+        card.innerHTML = `
+          <div class="p-2.5 bg-[#ff4d6d]/10 rounded-xl text-[#ff4d6d] font-bold text-lg select-none">${opt.icon}</div>
+          <div class="flex-1">
+            <h4 class="text-xs font-black theme-text-light">${opt.title}</h4>
+            <p class="text-[10px] theme-text-muted mt-0.5">${opt.desc}</p>
+          </div>
+          <span class="text-[10px] theme-text-muted font-bold">${opt.priceText}</span>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderWizardStep3() {
+      const cat = bookingState.category;
+      if (cat === 'plumbing') return; // Plumbing Step 3 is the AI result block handled in HTML
+      
+      const data = wizardCategoryData[cat].step3;
+      document.getElementById('wizardStep3Title').innerText = data.title;
+      document.getElementById('wizardStep3Sub').innerText = data.sub;
+
+      const container = document.getElementById('step3CardsContainer');
+      container.innerHTML = '';
+      data.options.forEach(opt => {
+        const isSelected = bookingState.unitType === opt.id;
+        const card = document.createElement('div');
+        card.id = `step3-opt-${opt.id}`;
+        card.className = `theme-card theme-transition border p-3.5 rounded-2xl cursor-pointer flex justify-between items-center hover:scale-[1.01] ${isSelected ? 'wizard-card-selected' : ''}`;
+        card.onclick = () => selectUnitType(opt.id);
+        card.innerHTML = `
+          <div class="flex items-center space-x-3.5">
+            <span class="text-xl select-none">${opt.icon}</span>
+            <div>
+              <h4 class="text-xs font-black theme-text-light">${opt.title}</h4>
+              <p class="text-[10px] theme-text-muted mt-0.5">${opt.desc}</p>
+            </div>
+          </div>
+          <span class="text-[10px] text-stone-500 font-bold">${opt.addon > 0 ? `+RM${opt.addon}` : 'No Addon'}</span>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderWizardStep4() {
+      const cat = bookingState.category;
+      if (cat === 'plumbing') return; // Plumbing has no Step 4
+      
+      const data = wizardCategoryData[cat].step4;
+      document.getElementById('wizardStep4Title').innerText = data.title;
+      document.getElementById('wizardStep4Sub').innerText = data.sub;
+
+      const container = document.getElementById('step4CardsContainer');
+      container.innerHTML = '';
+      data.options.forEach(opt => {
+        const isSelected = bookingState.method === opt.id;
+        const card = document.createElement('div');
+        card.id = `step4-opt-${opt.id}`;
+        card.className = `theme-card theme-transition border p-4 rounded-2xl cursor-pointer flex flex-col justify-between text-left h-[135px] relative hover:scale-[1.01] ${isSelected ? 'wizard-card-selected' : ''}`;
+        card.onclick = () => selectCleaningMethod(opt.id);
+        card.innerHTML = `
+          <div class="space-y-1">
+            <span class="text-lg select-none">${opt.icon}</span>
+            <h4 class="text-xs font-black theme-text-light">${opt.title}</h4>
+            <p class="text-[9px] theme-text-muted leading-tight">${opt.desc}</p>
+          </div>
+          <span class="text-[10px] font-black text-[#ff4d6d]">RM ${opt.price} / unit</span>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Dynamic interactive wizard controllers
+    function selectServiceType(id) {
+      bookingState.serviceType = id;
+      renderWizardStep1();
+      updatePriceEstimate();
+    }
+
+    function selectUnitType(id) {
+      bookingState.unitType = id;
+      renderWizardStep3();
+      updatePriceEstimate();
+    }
+
+    function selectCleaningMethod(id) {
+      bookingState.method = id;
+      renderWizardStep4();
+      updatePriceEstimate();
+    }
+
+    function adjustQuantity(amount) {
+      const newVal = bookingState.quantity + amount;
+      if (newVal < 1 || newVal > 10) return;
+      bookingState.quantity = newVal;
+      document.getElementById('wizardQuantityVal').innerText = newVal;
+      updatePriceEstimate();
+    }
+
+    function updatePriceEstimate() {
+      const pricing = calculateRunningTotal();
+      document.getElementById('runningTotalVal').innerText = `RM ${pricing.grandTotal.toFixed(2)}`;
+    }
+
+    function calculateRunningTotal() {
+      if (bookingState.category === 'plumbing') {
+        // Return flat booking deposit model for locked slots
+        return { unitRate: 50, subtotal: 50, sst: 0, grandTotal: 50 };
+      }
+      const cat = bookingState.category;
+      const data = wizardCategoryData[cat];
+
+      const baseOpt = data.step4.options.find(o => o.id === bookingState.method);
+      const basePrice = baseOpt ? baseOpt.price : 100;
+
+      const addonOpt = data.step3.options.find(o => o.id === bookingState.unitType);
+      const addonPrice = addonOpt ? addonOpt.addon : 0;
+
+      const unitRate = basePrice + addonPrice;
+      const subtotal = unitRate * bookingState.quantity;
+      const sst = subtotal * 0.08;
+      const grandTotal = subtotal + sst;
+
+      return { unitRate, subtotal, sst, grandTotal };
+    }
+
+    // Step navigators
+    function nextWizardStep() {
+      // Input Validation Guards
+      if (bookingState.category === 'plumbing') {
+        if (currentBookingStep === 2 && !bookingState.photoUploaded) {
+          showToast("Please tap to snap a photo before continuing!");
+          return;
+        }
+        if (currentBookingStep === 4 && (!bookingState.selectedDate || !bookingState.selectedTime)) {
+          showToast("Please select both Date and Time Slot!");
+          return;
+        }
+      } else {
+        if (currentBookingStep === 6 && (!bookingState.selectedDate || !bookingState.selectedTime)) {
+          showToast("Please select both Date and Time Slot!");
+          return;
+        }
+      }
+
+      if (currentBookingStep < totalBookingSteps) {
+        currentBookingStep++;
+        updateWizardUI();
+      }
+    }
+
+    // Adapt on click back navigation
+    function prevWizardStep() {
+      if (currentBookingStep > 1) {
+        currentBookingStep--;
+        updateWizardUI();
+      }
+    }
+
+    // Simulate Photo Scan Interaction (Plumbing Step 2)
+    function simulatePlumbingPhotoUpload() {
+      const laser = document.getElementById('scanLaser');
+      const text = document.getElementById('uploadPromptText');
+      const sub = document.getElementById('uploadPromptSub');
+      const feedback = document.getElementById('scanFeedbackBlock');
+
+      text.innerText = "Scanning Leaking Area...";
+      sub.innerText = "Analyzing leakage flow with computer vision AI...";
+      laser.classList.remove('opacity-0');
+
+      setTimeout(() => {
+        laser.classList.add('opacity-0');
+        text.innerText = "Kitchen_Pipe_Leak.jpg Uploaded ✓";
+        sub.innerText = "Sink connector structural seal fracture confirmed.";
+        feedback.classList.remove('hidden');
+        bookingState.photoUploaded = true;
+        showToast("AI Analysis Complete! Gasket joint fracture detected.");
+      }, 1800);
+    }
+
+    // Update Wizard visual components based on current steps
+    function updateWizardUI() {
+      const cat = bookingState.category;
+
+      // Reset step hidden parameters dynamically based on category
+      for (let i = 1; i <= 8; i++) {
+        const view = document.getElementById(`wizard-step-${i}`);
+        if (view) {
+          view.classList.add('hidden');
+        }
+      }
+
+      // Step layout routing mappings
+      let routedStep = currentBookingStep;
+      if (cat === 'plumbing') {
+        // Plumbing mapping: 
+        // 1: Issue Category (Step 1)
+        // 2: Photo Upload (Step 2 - custom layout)
+        // 3: AI Diagnosis (Step 3 - custom layout)
+        // 4: Slots Calendar (Step 6 layout)
+        // 5: Fiuu payment checkout (Step 7 layout)
+        // 6: Chat coordination (Step 8 layout)
+        if (currentBookingStep === 1) routedStep = 1;
+        else if (currentBookingStep === 2) routedStep = 2;
+        else if (currentBookingStep === 3) routedStep = 3;
+        else if (currentBookingStep === 4) routedStep = 6;
+        else if (currentBookingStep === 5) routedStep = 7;
+        else if (currentBookingStep === 6) routedStep = 8;
+      }
+
+      const activeView = document.getElementById(`wizard-step-${routedStep}`);
+      if (activeView) activeView.classList.remove('hidden');
+
+      // Progress Indicator text & width calculation
+      document.getElementById('wizardStepIndicator').innerText = `Step ${currentBookingStep} of ${totalBookingSteps}`;
+      const percentage = (currentBookingStep / totalBookingSteps) * 100;
+      document.getElementById('wizardProgressBar').style.width = `${percentage}%`;
+
+      // Disable wizard back button on step 1
+      const backBtn = document.getElementById('wizardBackBtn');
+      if (currentBookingStep === 1 || currentBookingStep === totalBookingSteps) {
+        backBtn.classList.add('opacity-30', 'pointer-events-none');
+      } else {
+        backBtn.classList.remove('opacity-30', 'pointer-events-none');
+      }
+
+      // Hide custom navigation footer on checkout and success/chat screens
+      const footer = document.getElementById('wizardFooter');
+      if (currentBookingStep >= totalBookingSteps) {
+        footer.classList.add('hidden');
+      } else {
+        footer.classList.remove('hidden');
+      }
+
+      // Summary rendering bind
+      if (cat === 'plumbing' && currentBookingStep === 5) {
+        // Render slot inspection checkout parameters
+        document.getElementById('wizardPaymentTitleText').innerText = "Slot Callout Booking Fee";
+        document.getElementById('wizardPaymentAmountText').innerText = "RM 50.00";
+      } else if (cat !== 'plumbing' && currentBookingStep === 5) {
+        const pricing = calculateRunningTotal();
+        const data = wizardCategoryData[cat];
+
+        const serviceName = data.step1.options.find(o => o.id === bookingState.serviceType)?.title || 'Service';
+        const unitName = data.step3.options.find(o => o.id === bookingState.unitType)?.title || 'Type';
+        const methodName = data.step4.options.find(o => o.id === bookingState.method)?.title || 'Standard';
+
+        document.getElementById('summaryServiceText').innerText = serviceName;
+        document.getElementById('summaryQtyText').innerText = `${bookingState.quantity} Unit(s)`;
+        document.getElementById('summaryUnitTypeText').innerText = unitName;
+        document.getElementById('summaryMethodText').innerText = methodName;
+
+        const unitRateEl = document.getElementById('summaryUnitPriceText');
+        if (unitRateEl) {
+          unitRateEl.innerText = `RM ${pricing.unitRate.toFixed(2)}`;
+        }
+        
+        document.getElementById('summarySubtotalText').innerText = `RM ${pricing.subtotal.toFixed(2)}`;
+        document.getElementById('summarySstText').innerText = `RM ${pricing.sst.toFixed(2)}`;
+        document.getElementById('summaryGrandTotalText').innerText = `RM ${pricing.grandTotal.toFixed(2)}`;
+        document.getElementById('wizardPaymentTitleText').innerText = "Checkout Total";
+        document.getElementById('wizardPaymentAmountText').innerText = `RM ${pricing.grandTotal.toFixed(2)}`;
+      }
+    }
+
+    // Schedule Slot triggers
+    function selectWizardDate(dateStr, element) {
+      bookingState.selectedDate = dateStr;
+      document.querySelectorAll('.wizard-date-card').forEach(card => card.classList.remove('wizard-card-selected'));
+      element.classList.add('wizard-card-selected');
+    }
+
+    // Time Slot trigger
+    function selectWizardTime(timeStr, element) {
+      bookingState.selectedTime = timeStr;
+      document.querySelectorAll('.wizard-time-btn').forEach(btn => btn.classList.remove('wizard-card-selected'));
+      element.classList.add('wizard-card-selected');
+    }
+
+    // Secure simulated gateway payment
+    function wizardProcessPayment() {
+      showToast("Verifying lock payment with secure Fiuu gateway...");
+      
+      setTimeout(() => {
+        const cat = bookingState.category;
+        const successDetails = document.getElementById('wizardSuccessDetails');
+        
+        if (cat === 'plumbing') {
+          successDetails.innerHTML = `<strong>${bookingState.vendor}</strong> slot callout secured!<br>Callout Fee receipt ID HJG-260515-00004 processed for <strong>${bookingState.selectedDate} at ${bookingState.selectedTime}</strong>.<br>The RM50.00 callout fee is non-refundable (covers labor & transport), and will be offset from your final repair invoice.`;
+        } else {
+          successDetails.innerHTML = `Receipt ID HJG-260515-00003 is processed successfully.<br><strong>${bookingState.vendor}</strong> slot for <strong>${bookingState.selectedDate} at ${bookingState.selectedTime}</strong> is officially locked.`;
+        }
+        
+        currentBookingStep = totalBookingSteps;
+        updateWizardUI();
+      }, 1500);
+    }
+
+    // Triggers direct chat once deposit paid
+    function finishWizardAndOpenChat() {
+      closeWizard();
+      let welcomeMessage = '';
+      
+      if (bookingState.category === 'plumbing') {
+        welcomeMessage = `Hi Unit B-08! I am Pak Abu. I received your priority leak scan ticket (Ref ID HJG-260515-00004). I see the photo of your kitchen pipe structural gasket leak. Since your slot is secured for **${bookingState.selectedDate} at ${bookingState.selectedTime}**, I have locked this in my calendar and will bring a replacement silicone gasket. I typically arrive 10 minutes before schedule!`;
+      } else {
+        welcomeMessage = `Hi Unit B-08! I am Aija, your HeyJaGa home service concierge assistant. I have verified your receipt HJG-260515-00003. Your service with **${bookingState.vendor}** is officially locked for **${bookingState.selectedDate}** at **${bookingState.selectedTime}**. Please specify if you need key-handover access coordinates!`;
+      }
+
+      startBookingChat(bookingState.vendor, welcomeMessage);
+    }
+
+    // Theme Switcher Logic
+    let currentTheme = 'dark';
+    function toggleTheme() {
+      const appFrame = document.getElementById('appFrame');
+      const sunIcon = document.getElementById('theme-sun-icon');
+      const moonIcon = document.getElementById('theme-moon-icon');
+      
+      if (currentTheme === 'dark') {
+        appFrame.classList.add('light-mode');
+        sunIcon.classList.add('hidden');
+        moonIcon.classList.remove('hidden');
+        currentTheme = 'light';
+        showToast("Switched to Light Mode! ☀️");
+      } else {
+        appFrame.classList.remove('light-mode');
+        sunIcon.classList.remove('hidden');
+        moonIcon.classList.add('hidden');
+        currentTheme = 'dark';
+        showToast("Switched to Dark Mode! 🌙");
+      }
+      
+      // Force refresh swipe cards if they exist to match colors
+      if (activeTab === 'market' && currentNearbyLayout === 'swipe') {
+        renderSwipeDeck();
+      }
+    }
+
+    // Live Ticker Cycle
+    let tickerIndex = 0;
+    const tickerTrack = document.getElementById('tickerTrack');
+    setInterval(() => {
+      tickerIndex = (tickerIndex + 1) % 4;
+      tickerTrack.style.top = `-${tickerIndex * 16}px`;
+    }, 4500);
+
+    // Mock Database
+    let database = {
+      rsvps: {
+        'rsvpCount-1': { count: 34, userJoined: false },
+        'rsvpCount-2': { count: 15, userJoined: false }
+      },
+      likes: {
+        'sarah-post': 24,
+        'tiktok-mode': 42
+      }
+    };
+
+    // Immersive slides
+    const tiktokSlides = [
+      {
+        id: 'slide1',
+        author: 'Sarah',
+        block: 'Block A',
+        initials: 'SA',
+        title: 'Nasi Lemak Uncle Eden',
+        desc: 'He is back in the carpark basement from 7-9am. Support our uncle! Only RM5, sambal is delicious.',
+        likes: 24,
+        comments: 8,
+        bgGradient: 'from-[#ff4d6d]/40 via-stone-900 to-black'
+      },
+      {
+        id: 'slide2',
+        author: 'CelcomDigi',
+        block: 'Partner Ad',
+        initials: 'CD',
+        title: 'High-Speed 5G at RM99/mo',
+        desc: 'Exclusive resident tier pricing. Instant delivery to your block unit. Get yours today!',
+        likes: 112,
+        comments: 29,
+        bgGradient: 'from-amber-600/40 via-stone-900 to-black'
+      }
+    ];
+    let currentTiktokSlideIndex = 0;
+
+    // Tinder Cards
+    const nearbyCards = [
+      {
+        id: 'card1',
+        name: 'Pak Din Locksmith',
+        distance: '0.8km away',
+        rating: '4.8 ★',
+        stat: 'Used by 12 neighbours',
+        tag: 'VETTED',
+        tagColor: 'bg-[#ff4d6d]/25 text-[#ff4d6d]',
+        desc: 'Emergency lock opening and duplicates. "Quick, reliable, works till midnight."'
+      },
+      {
+        id: 'card2',
+        name: 'BateriHub Changkat',
+        distance: '0.5km away',
+        stat: 'Used by 54 neighbours',
+        rating: '4.9 ★',
+        tag: 'FEATURED AD',
+        tagColor: 'bg-amber-500/25 text-amber-400',
+        desc: 'Express battery backup. Replaces within 15 mins right at your parking bay.'
+      },
+      {
+        id: 'card3',
+        name: 'Pak Abu Plumbing',
+        distance: '0.5km away',
+        stat: 'AI instant diagnosis active',
+        rating: '4.9 ★',
+        tag: 'FAST DIAGNOSIS',
+        tagColor: 'bg-emerald-500/25 text-emerald-400',
+        desc: 'Fix kitchen pipe leaks, sink clogs, burst mains. Tap Book to launch instant AI camera scanner.'
+      }
+    ];
+    let currentNearbyCardIndex = 0;
+
+    // Comments
+    let commentThreads = {
+      'sarah-post': [
+        { author: 'Jane Block B', text: 'Tried it this morning, the sambal was so authentic!' },
+        { author: 'Daniel Block A', text: 'Is he still there at 9 AM?' }
+      ],
+      'tiktok-mode': [
+        { author: 'Jason Block A', text: 'This vertical video pulse mode is incredible!' }
+      ]
+    };
+    let activeCommentThreadId = '';
+
+    let currentFeedLayout = 'classic';
+    let currentNearbyLayout = 'grid';
+    let activeTab = 'home';
+
+    // Tabs Switcher (Dynamic UI update based on the updated bottom nav bar)
+    function switchTab(tabId) {
+      activeTab = tabId;
+      // Clean up tab button visuals exactly mimicking image selection styles
+      ['home', 'market', 'notification', 'profile'].forEach(t => {
+        const btn = document.getElementById(`nav-${t}`);
+        const iconDiv = btn.querySelector('div');
+        if (t === tabId) {
+          iconDiv.className = "p-1 px-3 rounded-full bg-red-100 text-stone-900 transition-all";
+          btn.className = "flex-1 flex flex-col items-center space-y-1 text-stone-800 transition-colors";
+        } else {
+          iconDiv.className = "p-1 px-3 rounded-full text-stone-500 transition-all";
+          btn.className = "flex-1 flex flex-col items-center space-y-1 transition-colors";
+        }
+      });
+
+      // Central button state reset if switching out
+      document.getElementById('nav-central').className = "w-14 h-14 rounded-full bg-[#ff4d6d] hover:bg-[#ff5d7b] shadow-[0_4px_12px_rgba(255,77,109,0.4)] flex items-center justify-center transition-transform active:scale-90 border-4 border-white";
+
+      // Hide all content blocks
+      document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
+      
+      // Reveal targeted layout
+      document.getElementById(`view-${tabId}`).classList.remove('hidden');
+      document.getElementById('mainContentScroll').scrollTop = 0;
+
+      if (tabId === 'market' && currentNearbyLayout === 'swipe') {
+        renderSwipeDeck();
+      }
+    }
+
+    // Central Floating Master G/House Logo Button (Master social engine gateway)
+    function triggerCentralButton(subTab = 'feed') {
+      activeTab = 'jagaplus-social';
+      // Clear selections on bottom tabs
+      ['home', 'market', 'notification', 'profile'].forEach(t => {
+        const btn = document.getElementById(`nav-${t}`);
+        btn.querySelector('div').className = "p-1 px-3 rounded-full text-stone-500 transition-all";
+        btn.className = "flex-1 flex flex-col items-center space-y-1 transition-colors";
+      });
+
+      // Highlight Central logo button glowing pink
+      document.getElementById('nav-central').className = "w-14 h-14 rounded-full bg-[#ff4d6d] hover:bg-[#ff5d7b] shadow-[0_0_20px_#ff4d6d] flex items-center justify-center scale-105 transition-all border-4 border-white";
+
+      // Toggle JaGa+ Social View
+      document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
+      document.getElementById('view-jagaplus-social').classList.remove('hidden');
+      document.getElementById('mainContentScroll').scrollTop = 0;
+
+      setSocialSubTab(subTab);
+    }
+
+    // Sub navigation inside JaGa+ social hub (Feed & Events)
+    function setSocialSubTab(subTabId) {
+      const feedBtn = document.getElementById('subtab-social-feed');
+      const eventsBtn = document.getElementById('subtab-social-events');
+      
+      if (subTabId === 'feed') {
+        feedBtn.className = "flex-1 text-center py-2 text-xs font-black tracking-wide uppercase rounded-lg text-white bg-[#ff4d6d]";
+        eventsBtn.className = "flex-1 text-center py-2 text-xs font-extrabold tracking-wide uppercase rounded-lg theme-text-muted hover:text-white transition-all";
+        document.getElementById('social-feed-section').classList.remove('hidden');
+        document.getElementById('social-events-section').classList.add('hidden');
+      } else {
+        eventsBtn.className = "flex-1 text-center py-2 text-xs font-black tracking-wide uppercase rounded-lg text-white bg-[#ff4d6d]";
+        feedBtn.className = "flex-1 text-center py-2 text-xs font-extrabold tracking-wide uppercase rounded-lg theme-text-muted hover:text-white transition-all";
+        document.getElementById('social-feed-section').classList.add('hidden');
+        document.getElementById('social-events-section').classList.remove('hidden');
+      }
+    }
+
+    // Toggle Feed Layout Modes (Wall vs. TikTok-style)
+    function setFeedLayout(layout) {
+      currentFeedLayout = layout;
+      const wallBtn = document.getElementById('layout-classic-btn');
+      const scrollBtn = document.getElementById('layout-tiktok-btn');
+      
+      if (layout === 'classic') {
+        wallBtn.className = "px-2.5 py-0.5 rounded-md font-semibold text-white bg-[#ff4d6d]";
+        scrollBtn.className = "px-2.5 py-0.5 rounded-md font-semibold theme-text-muted";
+        document.getElementById('feed-items-container').classList.remove('hidden');
+        document.getElementById('immersive-tiktok-container').classList.add('hidden');
+      } else {
+        scrollBtn.className = "px-2.5 py-0.5 rounded-md font-semibold text-white bg-[#ff4d6d]";
+        wallBtn.className = "px-2.5 py-0.5 rounded-md font-semibold theme-text-muted";
+        document.getElementById('feed-items-container').classList.add('hidden');
+        document.getElementById('immersive-tiktok-container').classList.remove('hidden');
+        renderTiktokSlide();
+      }
+    }
+
+    function renderTiktokSlide() {
+      const slide = tiktokSlides[currentTiktokSlideIndex];
+      document.getElementById('slide-author').innerText = slide.author;
+      document.getElementById('slide-block').innerText = slide.block;
+      document.getElementById('slide-author-initials').innerText = slide.initials;
+      document.getElementById('slide-title').innerText = slide.title;
+      document.getElementById('slide-desc').innerText = slide.desc;
+      document.getElementById('slide-likes').innerText = slide.likes;
+      document.getElementById('slide-comments').innerText = slide.comments;
+
+      const slideBg = document.getElementById('immersive-slide-bg');
+      slideBg.className = `absolute inset-0 bg-cover bg-center transition-all duration-500 z-0 opacity-40 filter blur-sm bg-gradient-to-b ${slide.bgGradient}`;
+    }
+
+    function nextTiktokSlide() {
+      currentTiktokSlideIndex = (currentTiktokSlideIndex + 1) % tiktokSlides.length;
+      renderTiktokSlide();
+    }
+
+    // Immersive slide backward
+    function prevTiktokSlide() {
+      currentTiktokSlideIndex = (currentTiktokSlideIndex - 1 + tiktokSlides.length) % tiktokSlides.length;
+      renderTiktokSlide();
+    }
+
+    // Nearby layout modes
+    function setNearbyLayout(layout) {
+      currentNearbyLayout = layout;
+      const gridBtn = document.getElementById('nearby-grid-btn');
+      const swipeBtn = document.getElementById('nearby-swipe-btn');
+      
+      if (layout === 'grid') {
+        gridBtn.className = "px-2.5 py-1 rounded-md font-semibold text-white bg-[#ff4d6d]";
+        swipeBtn.className = "px-2.5 py-1 rounded-md font-semibold theme-text-muted";
+        document.getElementById('nearby-grid-area').classList.remove('hidden');
+        document.getElementById('nearby-swipe-area').classList.add('hidden');
+      } else {
+        swipeBtn.className = "px-2.5 py-1 rounded-md font-semibold text-white bg-[#ff4d6d]";
+        gridBtn.className = "px-2.5 py-1 rounded-md font-semibold theme-text-muted";
+        document.getElementById('nearby-grid-area').classList.add('hidden');
+        document.getElementById('nearby-swipe-area').classList.remove('hidden');
+        renderSwipeDeck();
+      }
+    }
+
+    // Tinder card deck renderer
+    function renderSwipeDeck() {
+      const deck = document.getElementById('swipe-card-deck');
+      deck.innerHTML = '';
+
+      if (currentNearbyCardIndex >= nearbyCards.length) {
+        deck.innerHTML = `
+          <div class="text-center p-8 space-y-3 text-stone-400 z-10">
+            <svg class="w-12 h-12 text-[#ff4d6d] mx-auto opacity-75" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <p class="text-xs font-extrabold text-stone-200">You have reviewed all local vendors!</p>
+            <button onclick="resetSwipeDeck()" class="text-[#ff4d6d] text-xs font-bold underline">Reset Swipe Cards</button>
+          </div>
+        `;
+        return;
+      }
+
+      for (let i = nearbyCards.length - 1; i >= currentNearbyCardIndex; i--) {
+        const item = nearbyCards[i];
+        const isTopCard = i === currentNearbyCardIndex;
+        const card = document.createElement('div');
+        
+        card.id = `swipe-card-${item.id}`;
+        
+        card.className = `swipe-card theme-transition absolute w-full max-w-[280px] h-[340px] border rounded-3xl p-5 shadow-2xl flex flex-col justify-between transition-all duration-300 transform ${
+          isTopCard ? 'z-20 scale-100' : 'z-10 scale-95 translate-y-3 opacity-60'
+        }`;
+
+        card.innerHTML = `
+          <div class="space-y-3">
+            <div class="flex justify-between items-start">
+              <span class="${item.tagColor} text-[8px] font-extrabold px-2 py-0.5 rounded uppercase tracking-wider">${item.tag}</span>
+              <span class="text-[10px] text-stone-400 font-bold">${item.distance}</span>
+            </div>
+            <div class="space-y-1">
+              <h3 class="text-sm font-black">${item.name}</h3>
+              <div class="flex items-center space-x-1">
+                <span class="text-xs text-amber-400 font-bold">${item.rating}</span>
+                <span class="text-[10px] text-[#9fc759] font-bold">${item.stat}</span>
+              </div>
+            </div>
+            <p class="text-xs leading-relaxed">${item.desc}</p>
+          </div>
+          <div class="pt-3 border-t border-slate-200/20 flex justify-between items-center text-[10px] text-stone-400 font-medium">
+            <span>Swipe matches right to save!</span>
+          </div>
+        `;
+
+        deck.appendChild(card);
+      }
+    }
+
+    function swipeAction(direction) {
+      if (currentNearbyCardIndex >= nearbyCards.length) return;
+      const item = nearbyCards[currentNearbyCardIndex];
+      const topCard = document.getElementById(`swipe-card-${item.id}`);
+      
+      if (direction === 'left') {
+        topCard.classList.add('swipe-left');
+        showToast("Skipped " + item.name);
+      } else {
+        topCard.classList.add('swipe-right');
+        showToast("Shortlisted " + item.name + "!");
+      }
+
+      setTimeout(() => {
+        currentNearbyCardIndex++;
+        renderSwipeDeck();
+      }, 350);
+    }
+
+    function bookingActionFromSwipe() {
+      if (currentNearbyCardIndex >= nearbyCards.length) return;
+      const item = nearbyCards[currentNearbyCardIndex];
+      openBookingWizard(item.name);
+    }
+
+    function resetSwipeDeck() {
+      currentNearbyCardIndex = 0;
+      renderSwipeDeck();
+    }
+
+    // Profile premium up-sells faq collapse
+    function toggleAccordion(faqId) {
+      const body = document.getElementById(`${faqId}-body`);
+      const icon = document.getElementById(`${faqId}-icon`);
+      
+      body.classList.toggle('hidden');
+      icon.style.transform = body.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+    }
+
+    // Open/Close Premium Tab via upsell actions
+    function openPremiumTab() {
+      switchTab('profile');
+      showToast("Opened JaGaPlus+ Premium Settings");
+    }
+
+    // Direct Service booking chat helpers
+    function startBookingChat(vendorName, message) {
+      document.getElementById('chatVendorName').innerText = vendorName;
+      document.getElementById('bookingChatDrawer').classList.remove('hidden');
+      if (message) {
+        // Clear old mock messages and preload customized concierge setup
+        const container = document.getElementById('chatMessages');
+        container.innerHTML = `
+          <div class="flex space-x-2">
+            <div class="w-8 h-8 rounded-xl bg-[#ff4d6d]/10 flex items-center justify-center shrink-0 border border-[#ff4d6d]/25">
+              <span class="text-[10px] font-bold text-[#ff4d6d]">VS</span>
+            </div>
+            <div class="theme-card theme-transition border p-3 rounded-2xl rounded-tl-none theme-text-light leading-relaxed max-w-[80%]">
+              ${message}
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // Adapt layout on click background dismissal or slider action
+    function closeBookingChat() {
+      document.getElementById('bookingChatDrawer').classList.add('hidden');
+    }
+
+    function handleSendButton() {
+      const input = document.getElementById('chatInput');
+      if (input.value.trim() === '') return;
+      sendQuickChatMessage(input.value);
+      input.value = '';
+    }
+
+    function sendQuickChatMessage(text) {
+      const container = document.getElementById('chatMessages');
+      const userBubble = document.createElement('div');
+      userBubble.className = "flex justify-end";
+      userBubble.innerHTML = `<div class="bg-[#ff4d6d] text-white p-3 rounded-2xl rounded-tr-none max-w-[80%] shadow-md">${text}</div>`;
+      container.appendChild(userBubble);
+      container.scrollTop = container.scrollHeight;
+
+      setTimeout(() => {
+        const reply = document.createElement('div');
+        reply.className = "flex space-x-2";
+        reply.innerHTML = `
+          <div class="w-8 h-8 rounded-xl bg-[#ff4d6d]/10 flex items-center justify-center shrink-0 border border-[#ff4d6d]/25"><span class="text-[10px] font-bold text-[#ff4d6d]">VS</span></div>
+          <div class="theme-card theme-transition border p-3 rounded-2xl rounded-tl-none theme-text-light max-w-[80%]">Received! I have logged your diagnostic metadata. Our team is fully dispatched. See you soon!</div>
+        `;
+        container.appendChild(reply);
+        container.scrollTop = container.scrollHeight;
+      }, 1200);
+    }
+
+    // Comment drawers
+    function openCommentDrawer(postId) {
+      activeCommentThreadId = postId;
+      document.getElementById('commentDrawer').classList.remove('hidden');
+      renderComments();
+    }
+
+    function closeCommentDrawer() {
+      document.getElementById('commentDrawer').classList.add('hidden');
+    }
+
+    // Comments layout renderer
+    function renderComments() {
+      const list = document.getElementById('commentList');
+      list.innerHTML = '';
+      const thread = commentThreads[activeCommentThreadId] || [];
+      thread.forEach(cmt => {
+        const row = document.createElement('div');
+        row.className = "theme-card border p-3 rounded-xl";
+        row.innerHTML = `<div class="text-[10px] theme-text-muted font-bold">${cmt.author}</div><p class="text-xs theme-text-light mt-1">${cmt.text}</p>`;
+        list.appendChild(row);
+      });
+    }
+
+    function addComment() {
+      const input = document.getElementById('newCommentInput');
+      if (input.value.trim() === '') return;
+      commentThreads[activeCommentThreadId].push({ author: 'You (Unit B-08)', text: input.value });
+      input.value = '';
+      renderComments();
+    }
+
+    // Likes & RSVPs
+    function triggerLike(btn) {
+      const countSpan = btn.querySelector('.count');
+      let val = parseInt(countSpan.innerText);
+      if (btn.classList.contains('text-[#ff4d6d]')) {
+        btn.classList.remove('text-[#ff4d6d]');
+        countSpan.innerText = val - 1;
+      } else {
+        btn.classList.add('text-[#ff4d6d]');
+        countSpan.innerText = val + 1;
+        createFloatingHearts(btn);
+      }
+    }
+
+    function triggerImmersiveLike() {
+      tiktokSlides[currentTiktokSlideIndex].likes++;
+      document.getElementById('slide-likes').innerText = tiktokSlides[currentTiktokSlideIndex].likes;
+      createFloatingHearts(document.querySelector('#immersive-tiktok-container button'));
+    }
+
+    function createFloatingHearts(target) {
+      const bounds = target.getBoundingClientRect();
+      const heart = document.createElement('div');
+      heart.innerHTML = '❤️';
+      heart.className = 'heart-bubble text-lg';
+      heart.style.left = `${bounds.width / 2}px`;
+      heart.style.bottom = '30px';
+      target.appendChild(heart);
+      setTimeout(() => heart.remove(), 800);
+    }
+
+    function toggleRSVP(btn, id, initial) {
+      const countEl = document.getElementById(id);
+      if (!database.rsvps[id].userJoined) {
+        database.rsvps[id].userJoined = true;
+        countEl.innerText = initial + 1;
+        btn.innerText = "Going ✓";
+        btn.className = "bg-[#9fc759] text-stone-950 text-[10px] font-extrabold px-3 py-1.5 rounded-xl transition-all";
+        showToast("RSVP secured!");
+      } else {
+        database.rsvps[id].userJoined = false;
+        countEl.innerText = initial;
+        btn.innerText = "RSVP Yes";
+        btn.className = "bg-[#1b2110] border border-[#303c1c] text-[#9fc759] text-[10px] font-extrabold px-3 py-1.5 rounded-xl transition-all";
+      }
+    }
+
+    function changeLocation(locName) {
+      document.getElementById('currentLocText').innerText = locName;
+      showToast(`Switched to ${locName}`);
+    }
+
+    // Simulated event and acknowledgement handlers
+    function showCreateEventToast() { showToast("Event created successfully!"); }
+    function simulateAcknowledge(n) { showToast(`Acknowledged: "${n}"`); }
+    function simulateSubscription() { showToast("Thank you for subscribing to JaGaPlus+!"); }
+    function triggerOfferClaim(o) { showToast(`Claiming exclusive resident offer: ${o}`); }
+
+    function showToast(m) {
+      const toast = document.getElementById('toastMessage');
+      document.getElementById('toastText').innerText = m;
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 2500);
+    }
+  </script>
+</body>
+</html>
